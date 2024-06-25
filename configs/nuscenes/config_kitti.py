@@ -126,9 +126,9 @@ data = dict(
         ignore_index=-1,
         loop=1),
     val=dict(
-        type='NuScenesDataset',
+        type='SemanticKITTIDataset',
         split='val',
-        data_root='data/nuscenes',
+        data_root='data/semantic_kitti',
         transform=[
             dict(
                 type='GridSample',
