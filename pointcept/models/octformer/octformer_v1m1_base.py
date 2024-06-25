@@ -16,6 +16,8 @@ try:
     import ocnn
     from ocnn.octree import Octree, Points
 except ImportError:
+    from pointcept.utils.misc import DummyClass
+    
     ocnn = None
     Octree = DummyClass
     Points = DummyClass
