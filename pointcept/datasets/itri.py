@@ -60,7 +60,7 @@ class ItriDataset(DefaultDataset):
                 data_list += [
                     os.path.join(seq_folder, file) for file in seq_files if file.endswith('.npy')
                 ]
-        return data_list
+        return sorted(data_list)
 
     def get_data(self, idx):
         data_path = self.data_list[idx % len(self.data_list)]
@@ -68,7 +68,7 @@ class ItriDataset(DefaultDataset):
         
         coord = scan_data[:, :3].reshape(-1, 3)
         strength = scan_data[:, 3].reshape([-1, 1])
-
+        
         # If you don't have segment data, you can create a dummy segment
         segment = np.zeros(scan_data.shape[0], dtype=np.int32)
         
@@ -78,7 +78,7 @@ class ItriDataset(DefaultDataset):
             segment=segment,
             name=self.get_data_name(idx),
         )
-        return sorted(data_dict)
+        return data_dict
 
     def get_data_name(self, idx):
         file_path = self.data_list[idx % len(self.data_list)]
