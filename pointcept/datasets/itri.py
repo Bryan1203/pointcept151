@@ -37,23 +37,29 @@ class ItriDataset(DefaultDataset):
         )
 
     def get_data_list(self):
-        # Define sequence IDs for each split
-        split_sequences = {
-            'train': [0, 1, 2, 3, 4, 5],
-            'val': [6,9],
-            'test': [10]
-        }
+        split2seq = dict(
+            train=[0, 1, 2, 3, 4, 5],
+            val=[6,9],
+            test=[7, 8],
+        )
+        if isinstance(self.split, str):
+            seq_list = split2seq[self.split]
+        elif isinstance(self.split, list):
+            seq_list = []
+            for split in self.split:
+                seq_list += split2seq[split]
+        else:
+            raise NotImplementedError
 
-        # Get the sequence IDs for the current split
-        sequences = split_sequences.get(self.split, [])
-        
         data_list = []
-        for seq in sequences:
+        for seq in seq_list:
+            seq = str(seq).zfill(2)
             seq_folder = os.path.join(self.data_root, seq)
             if os.path.isdir(seq_folder):
-                seq_files = glob.glob(os.path.join(seq_folder, "*.npy"))
-                data_list+=seq_files
-        
+                seq_files = sorted(os.listdir(seq_folder))
+                data_list += [
+                    os.path.join(seq_folder, file) for file in seq_files if file.endswith('.npy')
+                ]
         return data_list
 
     def get_data(self, idx):
