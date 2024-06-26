@@ -52,9 +52,9 @@ class ItriDataset(DefaultDataset):
             seq_folder = os.path.join(self.data_root, seq)
             if os.path.isdir(seq_folder):
                 seq_files = glob.glob(os.path.join(seq_folder, "*.npy"))
-                data_list.extend(seq_files)
+                data_list+=seq_files
         
-        return sorted(data_list)
+        return data_list
 
     def get_data(self, idx):
         data_path = self.data_list[idx % len(self.data_list)]
