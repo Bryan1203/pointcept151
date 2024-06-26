@@ -146,85 +146,70 @@ data = dict(
         test_mode=False,
         ignore_index=-1),
     test=dict(
-        type='SemanticKITTIDataset',
-        split='val',
-        data_root='data/semantic_kitti',
+        type="SemanticKITTIDataset",
+        split="val",
+        data_root="data/semantic_kitti",
         transform=[
-            dict(type='Copy', keys_dict=dict(segment='origin_segment')),
-            dict(
-                type='GridSample',
-                grid_size=0.025,
-                hash_type='fnv',
-                mode='train',
-                keys=('coord', 'strength', 'segment'),
-                return_inverse=True)
+            dict(type="PointClip", point_cloud_range=(-35.2, -35.2, -4, 35.2, 35.2, 2)),
         ],
         test_mode=True,
         test_cfg=dict(
             voxelize=dict(
-                type='GridSample',
+                type="GridSample",
                 grid_size=0.05,
-                hash_type='fnv',
-                mode='test',
+                hash_type="fnv",
+                mode="test",
                 return_grid_coord=True,
-                keys=('coord', 'strength')),
+                keys=("coord", "strength"),
+            ),
             crop=None,
             post_transform=[
-                dict(type='ToTensor'),
+                dict(type="Add", keys_dict={"condition": "SemanticKITTI"}),
+                dict(type="ToTensor"),
                 dict(
-                    type='Collect',
-                    keys=('coord', 'grid_coord', 'index'),
-                    feat_keys=('coord', 'strength'))
+                    type="Collect",
+                    keys=("coord", "grid_coord", "index", "condition"),
+                    feat_keys=("coord", "strength"),
+                ),
             ],
-            aug_transform=[[{
-                'type': 'RandomScale',
-                'scale': [0.9, 0.9]
-            }], [{
-                'type': 'RandomScale',
-                'scale': [0.95, 0.95]
-            }], [{
-                'type': 'RandomScale',
-                'scale': [1, 1]
-            }], [{
-                'type': 'RandomScale',
-                'scale': [1.05, 1.05]
-            }], [{
-                'type': 'RandomScale',
-                'scale': [1.1, 1.1]
-            }],
-                           [{
-                               'type': 'RandomScale',
-                               'scale': [0.9, 0.9]
-                           }, {
-                               'type': 'RandomFlip',
-                               'p': 1
-                           }],
-                           [{
-                               'type': 'RandomScale',
-                               'scale': [0.95, 0.95]
-                           }, {
-                               'type': 'RandomFlip',
-                               'p': 1
-                           }],
-                           [{
-                               'type': 'RandomScale',
-                               'scale': [1, 1]
-                           }, {
-                               'type': 'RandomFlip',
-                               'p': 1
-                           }],
-                           [{
-                               'type': 'RandomScale',
-                               'scale': [1.05, 1.05]
-                           }, {
-                               'type': 'RandomFlip',
-                               'p': 1
-                           }],
-                           [{
-                               'type': 'RandomScale',
-                               'scale': [1.1, 1.1]
-                           }, {
-                               'type': 'RandomFlip',
-                               'p': 1
-                           }]]),
-        ignore_index=-1))
+            aug_transform=[
+                [
+                    dict(
+                        type="RandomRotateTargetAngle",
+                        angle=[0],
+                        axis="z",
+                        center=[0, 0, 0],
+                        p=1,
+                    )
+                ],
+                [
+                    dict(
+                        type="RandomRotateTargetAngle",
+                        angle=[1 / 2],
+                        axis="z",
+                        center=[0, 0, 0],
+                        p=1,
+                    )
+                ],
+                [
+                    dict(
+                        type="RandomRotateTargetAngle",
+                        angle=[1],
+                        axis="z",
+                        center=[0, 0, 0],
+                        p=1,
+                    )
+                ],
+                [
+                    dict(
+                        type="RandomRotateTargetAngle",
+                        angle=[3 / 2],
+                        axis="z",
+                        center=[0, 0, 0],
+                        p=1,
+                    )
+                ],
+            ],
+        ),
+        ignore_index=-1,
+    )
