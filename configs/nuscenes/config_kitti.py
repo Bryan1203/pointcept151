@@ -78,80 +78,78 @@ scheduler = dict(
     anneal_strategy='cos',
     div_factor=10.0,
     final_div_factor=100.0)
-dataset_type = 'NuScenesDataset'
-data_root = 'data/nuscenes'
+# dataset settings
+dataset_type = "SemanticKITTIDataset"
+data_root = "data/semantic_kitti"
 ignore_index = -1
 names = [
-    'barrier', 'bicycle', 'bus', 'car', 'construction_vehicle', 'motorcycle',
-    'pedestrian', 'traffic_cone', 'trailer', 'truck', 'driveable_surface',
-    'other_flat', 'sidewalk', 'terrain', 'manmade', 'vegetation'
+    "car",
+    "bicycle",
+    "motorcycle",
+    "truck",
+    "other-vehicle",
+    "person",
+    "bicyclist",
+    "motorcyclist",
+    "road",
+    "parking",
+    "sidewalk",
+    "other-ground",
+    "building",
+    "fence",
+    "vegetation",
+    "trunk",
+    "terrain",
+    "pole",
+    "traffic-sign",
 ]
+
 data = dict(
-    num_classes=16,
-    ignore_index=-1,
-    names=[
-        'barrier', 'bicycle', 'bus', 'car', 'construction_vehicle',
-        'motorcycle', 'pedestrian', 'traffic_cone', 'trailer', 'truck',
-        'driveable_surface', 'other_flat', 'sidewalk', 'terrain', 'manmade',
-        'vegetation'
-    ],
+    num_classes=19,
+    ignore_index=ignore_index,
+    names=names,
     train=dict(
-        type='NuScenesDataset',
-        split='train',
-        data_root='data/nuscenes',
+        type=dataset_type,
+        split=["train", "val"],
+        data_root=data_root,
         transform=[
+            # dict(type="RandomDropout", dropout_ratio=0.2, dropout_application_ratio=0.2),
+            # dict(type="RandomRotateTargetAngle", angle=(1/2, 1, 3/2), center=[0, 0, 0], axis="z", p=0.75),
+            dict(type="RandomRotate", angle=[-1, 1], axis="z", center=[0, 0, 0], p=0.5),
+            # dict(type="RandomRotate", angle=[-1/6, 1/6], axis="x", p=0.5),
+            # dict(type="RandomRotate", angle=[-1/6, 1/6], axis="y", p=0.5),
+            dict(type="RandomScale", scale=[0.9, 1.1]),
+            # dict(type="RandomShift", shift=[0.2, 0.2, 0.2]),
+            dict(type="RandomFlip", p=0.5),
+            dict(type="RandomJitter", sigma=0.005, clip=0.02),
+            # dict(type="ElasticDistortion", distortion_params=[[0.2, 0.4], [0.8, 1.6]]),
             dict(
-                type='RandomRotate',
-                angle=[-1, 1],
-                axis='z',
-                center=[0, 0, 0],
-                p=0.5),
-            dict(type='RandomScale', scale=[0.9, 1.1]),
-            dict(type='RandomFlip', p=0.5),
-            dict(type='RandomJitter', sigma=0.005, clip=0.02),
-            dict(
-                type='GridSample',
+                type="GridSample",
                 grid_size=0.05,
-                hash_type='fnv',
-                mode='train',
-                keys=('coord', 'strength', 'segment'),
-                return_grid_coord=True),
-            dict(type='ToTensor'),
-            dict(
-                type='Collect',
-                keys=('coord', 'grid_coord', 'segment'),
-                feat_keys=('coord', 'strength'))
-        ],
-        test_mode=False,
-        ignore_index=-1,
-        loop=1),
-    val=dict(
-        type='SemanticKITTIDataset',
-        split='val',
-        data_root='data/semantic_kitti',
-        transform=[
-            dict(
-                type='GridSample',
-                grid_size=0.05,
-                hash_type='fnv',
-                mode='train',
-                keys=('coord', 'strength', 'segment'),
-                return_grid_coord=True),
-            dict(type='ToTensor'),
-            dict(
-                type='Collect',
-                keys=('coord', 'grid_coord', 'segment'),
-                feat_keys=('coord', 'strength'))
-        ],
-        test_mode=False,
-        ignore_index=-1),
-    test=dict(
-        type="SemanticKITTIDataset",
-        split="val",
-        data_root="data/semantic_kitti",
-        transform=[
+                hash_type="fnv",
+                mode="train",
+                keys=("coord", "strength", "segment"),
+                return_grid_coord=True,
+            ),
             dict(type="PointClip", point_cloud_range=(-35.2, -35.2, -4, 35.2, 35.2, 2)),
+            dict(type="SphereCrop", sample_rate=0.8, mode="random"),
+            dict(type="SphereCrop", point_max=120000, mode="random"),
+            # dict(type="CenterShift", apply_z=False),
+            dict(type="ToTensor"),
+            dict(
+                type="Collect",
+                keys=("coord", "grid_coord", "segment"),
+                feat_keys=("coord", "strength"),
+            ),
         ],
+        test_mode=False,
+        ignore_index=ignore_index,
+    ),
+    test=dict(
+        type=dataset_type,
+        split="test",
+        data_root=data_root,
+        transform=[],
         test_mode=True,
         test_cfg=dict(
             voxelize=dict(
@@ -164,11 +162,14 @@ data = dict(
             ),
             crop=None,
             post_transform=[
-                dict(type="Add", keys_dict={"condition": "SemanticKITTI"}),
+                dict(
+                    type="PointClip",
+                    point_cloud_range=(-35.2, -35.2, -4, 35.2, 35.2, 2),
+                ),
                 dict(type="ToTensor"),
                 dict(
                     type="Collect",
-                    keys=("coord", "grid_coord", "index", "condition"),
+                    keys=("coord", "grid_coord", "index"),
                     feat_keys=("coord", "strength"),
                 ),
             ],
@@ -211,5 +212,6 @@ data = dict(
                 ],
             ],
         ),
-        ignore_index=-1,
-    ))
+        ignore_index=ignore_index,
+    ),
+)
