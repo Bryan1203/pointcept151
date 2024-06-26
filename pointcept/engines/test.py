@@ -299,7 +299,7 @@ class SemSegTester(TesterBase):
                         "sequences",
                         sequence_name,
                         "predictions",
-                        f"{frame_name}.label",
+                        f"{frame_name}.npy",
                     )
                 )
             elif self.cfg.data.test.type == "NuScenesDataset":
