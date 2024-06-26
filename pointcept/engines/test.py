@@ -136,6 +136,10 @@ class SemSegTester(TesterBase):
             self.cfg.data.test.type == "SemanticKITTIDataset" and comm.is_main_process()
         ):
             make_dirs(os.path.join(save_path, "submit"))
+        elif (
+            self.cfg.data.test.type == "ItriDataset" and comm.is_main_process()
+        ):
+            make_dirs(os.path.join(save_path, "submit"))
         elif self.cfg.data.test.type == "NuScenesDataset" and comm.is_main_process():
             import json
 
@@ -255,6 +259,29 @@ class SemSegTester(TesterBase):
             elif self.cfg.data.test.type == "SemanticKITTIDataset":
                 # 00_000000 -> 00, 000000
                 sequence_name, frame_name = data_name.split("_")
+                os.makedirs(
+                    os.path.join(
+                        save_path, "submit", "sequences", sequence_name, "predictions"
+                    ),
+                    exist_ok=True,
+                )
+                submit = pred.astype(np.uint32)
+                submit = np.vectorize(
+                    self.test_loader.dataset.learning_map_inv.__getitem__
+                )(submit).astype(np.uint32)
+                submit.tofile(
+                    os.path.join(
+                        save_path,
+                        "submit",
+                        "sequences",
+                        sequence_name,
+                        "predictions",
+                        f"{frame_name}.label",
+                    )
+                )
+            elif self.cfg.data.test.type == "ItriDataset":
+                # data_name is in the format "sequence_id_frame_id"
+                sequence_name, frame_name = data_name.split('_', 1)
                 os.makedirs(
                     os.path.join(
                         save_path, "submit", "sequences", sequence_name, "predictions"
