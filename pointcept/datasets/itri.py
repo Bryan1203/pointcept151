@@ -66,10 +66,10 @@ class ItriDataset(DefaultDataset):
         data_path = self.data_list[idx % len(self.data_list)]
         scan_data = np.load(data_path)
         
-        coord = scan_data[:, :3].shape
-        strength = scan_data[:, 3].shape
+        coord = scan_data[:, :3].reshape(-1, 3)
+        strength = scan_data[:, 3].reshape([-1, 1])
 
-        print("coord and strength:",coord,strength)
+        print("coord and strength:",coord.shape,strength.shape)
         
         # If you don't have segment data, you can create a dummy segment
         segment = np.zeros(scan_data.shape[0], dtype=np.int32)
