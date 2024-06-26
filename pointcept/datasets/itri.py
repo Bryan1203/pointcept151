@@ -58,7 +58,7 @@ class ItriDataset(DefaultDataset):
             if os.path.isdir(seq_folder):
                 seq_files = sorted(os.listdir(seq_folder))
                 data_list += [
-                    os.path.join(seq_folder, file) for file in seq_files if file.endswith('.npy')
+                    os.path.join(seq_folder, file) for file in seq_files
                 ]
         return sorted(data_list)
 
@@ -84,6 +84,7 @@ class ItriDataset(DefaultDataset):
         file_path = self.data_list[idx % len(self.data_list)]
         file_name = os.path.basename(file_path)
         data_name = os.path.splitext(file_name)[0]  # Remove the .npy extension
+        print(data_name)
         return data_name
 
     @staticmethod
