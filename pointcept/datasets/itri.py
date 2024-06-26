@@ -12,7 +12,6 @@ from .builder import DATASETS
 from .defaults import DefaultDataset
 import glob
 
-
 @DATASETS.register_module()
 class ItriDataset(DefaultDataset):
     def __init__(
