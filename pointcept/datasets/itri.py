@@ -68,6 +68,8 @@ class ItriDataset(DefaultDataset):
         
         coord = scan_data[:, :3].reshape(-1, 3)
         strength = scan_data[:, 3].reshape([-1, 1])
+
+        print("coord and strength:",coord,strength)
         
         # If you don't have segment data, you can create a dummy segment
         segment = np.zeros(scan_data.shape[0], dtype=np.int32)
