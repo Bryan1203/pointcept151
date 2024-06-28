@@ -38,9 +38,9 @@ class ItriDataset(DefaultDataset):
 
     def get_data_list(self):
         split2seq = dict(
-            train=[0, 1, 2, 3, 4, 5],
-            val=[9],
-            test=[7, 8],
+            train=[0, 1, 2, 3, 4, 5, 6, 7, 9, 10],
+            val=[0,2,5,6,7,8,9,10],
+            test=[11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
         )
         if isinstance(self.split, str):
             seq_list = split2seq[self.split]
@@ -54,24 +54,30 @@ class ItriDataset(DefaultDataset):
         data_list = []
         for seq in seq_list:
             seq = str(seq).zfill(2)
-            seq_folder = os.path.join(self.data_root, seq)
-            if os.path.isdir(seq_folder):
-                seq_files = sorted(os.listdir(seq_folder))
-                data_list += [
-                    os.path.join(seq_folder, file) for file in seq_files
-                ]
-        return sorted(data_list)
+            seq_folder = os.path.join(self.data_root, "dataset", "sequences", seq)
+            seq_files = sorted(os.listdir(os.path.join(seq_folder, "velodyne")))
+            data_list += [
+                os.path.join(seq_folder, "velodyne", file) for file in seq_files
+            ]
+        return data_list
 
     def get_data(self, idx):
         data_path = self.data_list[idx % len(self.data_list)]
-        scan_data = np.load(data_path)
-        
-        coord = scan_data[:, :3].reshape(-1, 3)
-        strength = scan_data[:, 3].reshape([-1, 1]) / 255
-        
-        # If you don't have segment data, you can create a dummy segment
-        segment = np.zeros(scan_data.shape[0], dtype=np.int32)
-        
+        with open(data_path, "rb") as b:
+            scan = np.fromfile(b, dtype=np.float32).reshape(-1, 4)
+        coord = scan[:, :3]
+        strength = scan[:, -1].reshape([-1, 1])
+
+        label_file = data_path.replace("velodyne", "labels").replace(".bin", ".label")
+        if os.path.exists(label_file):
+            with open(label_file, "rb") as a:
+                segment = np.fromfile(a, dtype=np.int32).reshape(-1)
+                segment = np.vectorize(self.learning_map.__getitem__)(
+                    segment & 0xFFFF
+                ).astype(np.int32)
+        else:
+            segment = np.zeros(scan.shape[0]).astype(np.int32)
+        #data_dict = dict(coord=coord, strength=strength, segment=segment)
         data_dict = dict(
             coord=coord,
             strength=strength,
@@ -82,9 +88,10 @@ class ItriDataset(DefaultDataset):
 
     def get_data_name(self, idx):
         file_path = self.data_list[idx % len(self.data_list)]
-        file_name = os.path.basename(file_path)
-        data_name = os.path.splitext(file_name)[0]  # Remove the .npy extension
-        print(data_name)
+        dir_path, file_name = os.path.split(file_path)
+        sequence_name = os.path.basename(os.path.dirname(dir_path))
+        frame_name = os.path.splitext(file_name)[0]
+        data_name = f"{sequence_name}_{frame_name}"
         return data_name
 
     @staticmethod
