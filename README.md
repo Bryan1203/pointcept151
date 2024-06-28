@@ -128,7 +128,8 @@ conda create -n pointcept python=3.8 -y
 conda activate pointcept
 conda install ninja -y
 # Choose version you want here: https://pytorch.org/get-started/previous-versions/
-conda install pytorch==1.12.1 torchvision==0.13.1 torchaudio==0.12.1 cudatoolkit=11.3 -c pytorch -y
+conda install pytorch==2.0.0 torchvision==0.15.0 torchaudio==2.0.0 pytorch-cuda=11.8 -c pytorch -c nvidia
+# conda install pytorch==1.12.1 torchvision==0.13.1 torchaudio==0.12.1 cudatoolkit=11.3 -c pytorch -y
 conda install h5py pyyaml -c anaconda -y
 conda install sharedarray tensorboard tensorboardx yapf addict einops scipy plyfile termcolor timm -c conda-forge -y
 conda install pytorch-cluster pytorch-scatter pytorch-sparse -c pyg -y
@@ -142,6 +143,16 @@ pip install spconv-cu113
 cd libs/pointops
 # usual
 python setup.py install
+
+# to preven pointops group not found error
+conda install -c bioconda google-sparsehash 
+cd libs/pointgroup_ops
+python setup.py install --include_dirs=${CONDA_PREFIX}/include
+cd ../..
+
+# flash atten install
+pip install flash-attn --no-build-isolation
+
 # docker & multi GPU arch
 TORCH_CUDA_ARCH_LIST="ARCH LIST" python  setup.py install
 # e.g. 7.5: RTX 3000; 8.0: a100 More available in: https://developer.nvidia.com/cuda-gpus
