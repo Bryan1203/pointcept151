@@ -97,7 +97,7 @@ class SemanticKITTIDataset(DefaultDataset):
     @staticmethod
     def get_learning_map(ignore_index):
         learning_map = {
-            0: 0,  # "unlabeled"
+            0: ignore_index,  # "unlabeled"
             # 1: ignore_index,  # "outlier" mapped to "unlabeled" --------------------------mapped
             # 10: 0,  # "car"
             # 11: 1,  # "bicycle"

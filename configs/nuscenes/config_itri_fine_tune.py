@@ -28,7 +28,7 @@ train = dict(type='DefaultTrainer')
 test = dict(type='SemSegTester', verbose=True)
 model = dict(
     type='DefaultSegmentorV2',
-    num_classes=8,
+    num_classes=7,
     backbone_out_channels=64,
     backbone=dict(
         type='PT-v3m1',
@@ -81,12 +81,12 @@ scheduler = dict(
 # dataset_type = 'NuScenesDataset'
 # data_root = 'data/nuscenes'
 ignore_index = -1
-names = ['background', 'white_dashed_line', 'white_line', 'double_white_line', 
+names = ['white_dashed_line', 'white_line', 'double_white_line', 
            'yellow_dashed_line', 'yellow_line', 'double_yellow_line', 'red_line']
 data = dict(
-    num_classes=8,
+    num_classes=7,
     ignore_index=-1,
-    names=['background', 'white_dashed_line', 'white_line', 'double_white_line', 
+    names=['white_dashed_line', 'white_line', 'double_white_line', 
            'yellow_dashed_line', 'yellow_line', 'double_yellow_line', 'red_line'],
     train=dict(
         type='SemanticKITTIDataset',
