@@ -131,13 +131,13 @@ class SemanticKITTIDataset(DefaultDataset):
             # 257: 4,  # "moving-bus" mapped to "other-vehicle" -------------------mapped
             # 258: 3,  # "moving-truck" to "truck" --------------------------------mapped
             # 259: 4,  # "moving-other"-vehicle to "other-vehicle" ----------------mapped
-            1: 1, 
-            2: 2,
-            3: 3, 
-            4: 4,
-            5: 5, 
-            6: 6, 
-            7: 7,
+            1: 0, 
+            2: 1,
+            3: 2, 
+            4: 3,
+            5: 4, 
+            6: 5, 
+            7: 6,
         }
         return learning_map
 
@@ -164,13 +164,13 @@ class SemanticKITTIDataset(DefaultDataset):
             # 16: 72,  # "terrain"
             # 17: 80,  # "pole"
             # 18: 81,  # "traffic-sign"
-            0: 0,
-            1: 1, 
-            2: 2,
-            3: 3, 
-            4: 4,
-            5: 5, 
-            6: 6, 
-            7: 7,
+
+            0: 1, 
+            1: 2,
+            2: 3, 
+            3: 4,
+            4: 5, 
+            5: 6, 
+            6: 7,
         }
         return learning_map_inv
