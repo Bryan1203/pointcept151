@@ -80,7 +80,7 @@ scheduler = dict(
     final_div_factor=100.0)
 # dataset_type = 'NuScenesDataset'
 # data_root = 'data/nuscenes'
-ignore_index = -1
+ignore_index = 0
 names = ['white_dashed_line', 'white_line', 'double_white_line', 
            'yellow_dashed_line', 'yellow_line', 'double_yellow_line', 'red_line']
 data = dict(
