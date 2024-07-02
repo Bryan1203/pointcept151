@@ -165,12 +165,12 @@ class SemanticKITTIDataset(DefaultDataset):
             # 17: 80,  # "pole"
             # 18: 81,  # "traffic-sign"
 
-            0: 1, 
-            1: 2,
-            2: 3, 
-            3: 4,
-            4: 5, 
-            5: 6, 
-            6: 7,
+            # 0: 1, 
+            # 1: 2,
+            # 2: 3, 
+            # 3: 4,
+            # 4: 5, 
+            # 5: 6, 
+            # 6: 7,
         }
         return learning_map_inv
