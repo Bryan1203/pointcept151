@@ -97,21 +97,55 @@ class SemanticKITTIDataset(DefaultDataset):
     @staticmethod
     def get_learning_map(ignore_index):
         learning_map = {
+            # 0: ignore_index,  # "unlabeled"
+            # 1: 0, 
+            # 2: 1,
+            # 3: 2, 
+            # 4: 3,
+            # 5: 4, 
+            # 6: 5, 
+            # 7: 6,
             0: ignore_index,  # "unlabeled"
-            1: 0, 
-            2: 1,
-            3: 2, 
-            4: 3,
-            5: 4, 
-            6: 5, 
-            7: 6,
+            1: ignore_index,  # "outlier" mapped to "unlabeled" --------------------------mapped
+            10: 0,  # "car"
+            11: 1,  # "bicycle"
+            13: 4,  # "bus" mapped to "other-vehicle" --------------------------mapped
+            15: 2,  # "motorcycle"
+            16: 4,  # "on-rails" mapped to "other-vehicle" ---------------------mapped
+            18: 3,  # "truck"
+            20: 4,  # "other-vehicle"
+            30: 5,  # "person"
+            31: 6,  # "bicyclist"
+            32: 7,  # "motorcyclist"
+            40: 8,  # "road"
+            44: 9,  # "parking"
+            48: 10,  # "sidewalk"
+            49: 11,  # "other-ground"
+            50: 12,  # "building"
+            51: 13,  # "fence"
+            52: ignore_index,  # "other-structure" mapped to "unlabeled" ------------------mapped
+            60: 8,  # "lane-marking" to "road" ---------------------------------mapped
+            70: 14,  # "vegetation"
+            71: 15,  # "trunk"
+            72: 16,  # "terrain"
+            80: 17,  # "pole"
+            81: 18,  # "traffic-sign"
+            99: ignore_index,  # "other-object" to "unlabeled" ----------------------------mapped
+            252: 0,  # "moving-car" to "car" ------------------------------------mapped
+            253: 6,  # "moving-bicyclist" to "bicyclist" ------------------------mapped
+            254: 5,  # "moving-person" to "person" ------------------------------mapped
+            255: 7,  # "moving-motorcyclist" to "motorcyclist" ------------------mapped
+            256: 4,  # "moving-on-rails" mapped to "other-vehicle" --------------mapped
+            257: 4,  # "moving-bus" mapped to "other-vehicle" -------------------mapped
+            258: 3,  # "moving-truck" to "truck" --------------------------------mapped
+            259: 4,  # "moving-other"-vehicle to "other-vehicle" ----------------mapped
         }
         return learning_map
 
     @staticmethod
     def get_learning_map_inv(ignore_index):
         learning_map_inv = {
-            # ignore_index: 0,
+            # ignore_index: ignore_index,
             # 0: 1, 
             # 1: 2,
             # 2: 3, 
