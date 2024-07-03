@@ -53,6 +53,16 @@ class DefaultSegmentorV2(nn.Module):
         point = Point(input_dict)
         point = self.backbone(point)
         seg_logits = self.seg_head(point.feat)
+
+        backbone_features = point.feat  # This is the 64-channel backbone output
+
+        # Return backbone features along with other outputs
+        output = {
+            'backbone_features': backbone_features,
+            'seg_logits': seg_logits
+        }
+
+
         # train
         if self.training:
             loss = self.criteria(seg_logits, input_dict["segment"])
@@ -63,7 +73,8 @@ class DefaultSegmentorV2(nn.Module):
             return dict(loss=loss, seg_logits=seg_logits)
         # test
         else:
-            return dict(seg_logits=seg_logits)
+            #return dict(seg_logits=seg_logits)
+            return output
 
 
 @MODELS.register_module()

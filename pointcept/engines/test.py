@@ -177,6 +177,7 @@ class SemSegTester(TesterBase):
                 pred = np.load(pred_save_path)
             else:
                 pred = torch.zeros((segment.size, self.cfg.data.num_classes)).cuda()
+                features = torch.zeros((segment.size, 64)).cuda()  # Initialize feature tensor
                 for i in range(len(fragment_list)):
                     fragment_batch_size = 1
                     s_i, e_i = i * fragment_batch_size, min(
@@ -188,12 +189,14 @@ class SemSegTester(TesterBase):
                             input_dict[key] = input_dict[key].cuda(non_blocking=True)
                     idx_part = input_dict["index"]
                     with torch.no_grad():
+                        feature_part = self.model(input_dict)["backbone_features"]
                         pred_part = self.model(input_dict)["seg_logits"]  # (n, k)
                         pred_part = F.softmax(pred_part, -1)
                         if self.cfg.empty_cache:
                             torch.cuda.empty_cache()
                         bs = 0
                         for be in input_dict["offset"]:
+                            features[idx_part[bs:be], :] = feature_part[bs:be]
                             pred[idx_part[bs:be], :] += pred_part[bs:be]
                             bs = be
 
@@ -206,8 +209,13 @@ class SemSegTester(TesterBase):
                             batch_num=len(fragment_list),
                         )
                     )
+                # Save features
+                feature_save_path = os.path.join(save_path, "{}_features.npy".format(data_name))
+                np.save(feature_save_path, features.cpu().numpy())
+
                 pred = pred.max(1)[1].data.cpu().numpy()
                 np.save(pred_save_path, pred)
+
             if "origin_segment" in data_dict.keys():
                 assert "inverse" in data_dict.keys()
                 pred = pred[data_dict["inverse"]]

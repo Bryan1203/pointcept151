@@ -78,8 +78,8 @@ scheduler = dict(
     anneal_strategy='cos',
     div_factor=10.0,
     final_div_factor=100.0)
-dataset_type = 'NuScenesDataset'
-data_root = 'data/nuscenes'
+dataset_type = 'SemanticKITTIDataset'
+data_root = 'data/itri'
 ignore_index = -1
 names = [
     'barrier', 'bicycle', 'bus', 'car', 'construction_vehicle', 'motorcycle',
