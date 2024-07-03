@@ -111,13 +111,33 @@ class SemanticKITTIDataset(DefaultDataset):
     @staticmethod
     def get_learning_map_inv(ignore_index):
         learning_map_inv = {
-            ignore_index: 0,
-            0: 1, 
-            1: 2,
-            2: 3, 
-            3: 4,
-            4: 5, 
-            5: 6, 
-            6: 7,
+            # ignore_index: 0,
+            # 0: 1, 
+            # 1: 2,
+            # 2: 3, 
+            # 3: 4,
+            # 4: 5, 
+            # 5: 6, 
+            # 6: 7,
+            ignore_index: ignore_index,  # "unlabeled"
+            0: 10,  # "car"
+            1: 11,  # "bicycle"
+            2: 15,  # "motorcycle"
+            3: 18,  # "truck"
+            4: 20,  # "other-vehicle"
+            5: 30,  # "person"
+            6: 31,  # "bicyclist"
+            7: 32,  # "motorcyclist"
+            8: 40,  # "road"
+            9: 44,  # "parking"
+            10: 48,  # "sidewalk"
+            11: 49,  # "other-ground"
+            12: 50,  # "building"
+            13: 51,  # "fence"
+            14: 70,  # "vegetation"
+            15: 71,  # "trunk"
+            16: 72,  # "terrain"
+            17: 80,  # "pole"
+            18: 81,  # "traffic-sign"
         }
         return learning_map_inv
