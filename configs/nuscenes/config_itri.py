@@ -4,20 +4,20 @@ evaluate = True
 test_only = False
 seed = 28024989
 save_path = 'exp/nuscenes/semseg-pt-v3m1-0-base'
-num_worker = 16
-batch_size = 12
+num_worker = 48
+batch_size = 1
 batch_size_val = None
 batch_size_test = None
-epoch = 50
-eval_epoch = 50
+epoch = 20
+eval_epoch = 20
 sync_bn = False
-enable_amp = True
+enable_amp = False
 empty_cache = False
 find_unused_parameters = False
 mix_prob = 0.8
 param_dicts = [dict(keyword='block', lr=0.0002)]
 hooks = [
-    dict(type='CheckpointLoader'),
+    dict(type="CheckpointLoader", keywords="module.seg_head.", replacement="module.seg_head_duplicate."),
     dict(type='IterationTimer', warmup_iter=2),
     dict(type='InformationWriter'),
     dict(type='SemSegEvaluator'),
@@ -52,7 +52,7 @@ model = dict(
         shuffle_orders=True,
         pre_norm=True,
         enable_rpe=False,
-        enable_flash=False,
+        enable_flash=True,
         upcast_attention=False,
         upcast_softmax=False,
         cls_mode=False,
@@ -70,7 +70,7 @@ model = dict(
             loss_weight=1.0,
             ignore_index=-1)
     ])
-optimizer = dict(type='AdamW', lr=0.002, weight_decay=0.005)
+optimizer = dict(type='AdamW', lr=0.0002, weight_decay=0.005)
 scheduler = dict(
     type='OneCycleLR',
     max_lr=[0.002, 0.0002],
@@ -78,8 +78,8 @@ scheduler = dict(
     anneal_strategy='cos',
     div_factor=10.0,
     final_div_factor=100.0)
-dataset_type = 'NuScenesDataset'
-data_root = 'data/nuscenes'
+# dataset_type = 'NuScenesDataset'
+# data_root = 'data/nuscenes'
 ignore_index = -1
 names = [
     'barrier', 'bicycle', 'bus', 'car', 'construction_vehicle', 'motorcycle',
@@ -90,15 +90,14 @@ data = dict(
     num_classes=16,
     ignore_index=-1,
     names=[
-        'barrier', 'bicycle', 'bus', 'car', 'construction_vehicle',
-        'motorcycle', 'pedestrian', 'traffic_cone', 'trailer', 'truck',
-        'driveable_surface', 'other_flat', 'sidewalk', 'terrain', 'manmade',
-        'vegetation'
-    ],
+    'barrier', 'bicycle', 'bus', 'car', 'construction_vehicle', 'motorcycle',
+    'pedestrian', 'traffic_cone', 'trailer', 'truck', 'driveable_surface',
+    'other_flat', 'sidewalk', 'terrain', 'manmade', 'vegetation'
+],
     train=dict(
-        type='NuScenesDataset',
+        type='SemanticKITTIDataset',
         split='train',
-        data_root='data/nuscenes',
+        data_root='data/itri',
         transform=[
             dict(
                 type='RandomRotate',
@@ -126,9 +125,9 @@ data = dict(
         ignore_index=-1,
         loop=1),
     val=dict(
-        type='NuScenesDataset',
+        type='SemanticKITTIDataset',
         split='val',
-        data_root='data/nuscenes',
+        data_root='data/itri',
         transform=[
             dict(
                 type='GridSample',
