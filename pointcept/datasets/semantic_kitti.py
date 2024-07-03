@@ -14,33 +14,17 @@ from .defaults import DefaultDataset
 
 @DATASETS.register_module()
 class SemanticKITTIDataset(DefaultDataset):
-    def __init__(
-        self,
-        split="train",
-        data_root="data/semantic_kitti",
-        transform=None,
-        test_mode=False,
-        test_cfg=None,
-        loop=1,
-        ignore_index=-1,
-    ):
+    def __init__(self, ignore_index=-1, **kwargs):
         self.ignore_index = ignore_index
         self.learning_map = self.get_learning_map(ignore_index)
         self.learning_map_inv = self.get_learning_map_inv(ignore_index)
-        super().__init__(
-            split=split,
-            data_root=data_root,
-            transform=transform,
-            test_mode=test_mode,
-            test_cfg=test_cfg,
-            loop=loop,
-        )
+        super().__init__(ignore_index=ignore_index, **kwargs)
 
     def get_data_list(self):
         split2seq = dict(
-            train=[6],
+            train=[0, 1, 2, 3, 4, 5, 6, 7, 9, 10],
             val=[6],
-            test=[6],
+            test=[11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
         )
         if isinstance(self.split, str):
             seq_list = split2seq[self.split]
@@ -77,7 +61,6 @@ class SemanticKITTIDataset(DefaultDataset):
                 ).astype(np.int32)
         else:
             segment = np.zeros(scan.shape[0]).astype(np.int32)
-        #data_dict = dict(coord=coord, strength=strength, segment=segment)
         data_dict = dict(
             coord=coord,
             strength=strength,
@@ -97,14 +80,6 @@ class SemanticKITTIDataset(DefaultDataset):
     @staticmethod
     def get_learning_map(ignore_index):
         learning_map = {
-            # 0: ignore_index,  # "unlabeled"
-            # 1: 0, 
-            # 2: 1,
-            # 3: 2, 
-            # 4: 3,
-            # 5: 4, 
-            # 6: 5, 
-            # 7: 6,
             0: ignore_index,  # "unlabeled"
             1: ignore_index,  # "outlier" mapped to "unlabeled" --------------------------mapped
             10: 0,  # "car"
@@ -145,14 +120,6 @@ class SemanticKITTIDataset(DefaultDataset):
     @staticmethod
     def get_learning_map_inv(ignore_index):
         learning_map_inv = {
-            # ignore_index: ignore_index,
-            # 0: 1, 
-            # 1: 2,
-            # 2: 3, 
-            # 3: 4,
-            # 4: 5, 
-            # 5: 6, 
-            # 6: 7,
             ignore_index: ignore_index,  # "unlabeled"
             0: 10,  # "car"
             1: 11,  # "bicycle"
