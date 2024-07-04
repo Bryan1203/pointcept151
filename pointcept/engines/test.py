@@ -212,6 +212,7 @@ class SemSegTester(TesterBase):
                 # Save features
                 # feature_save_path = os.path.join(save_path, "{}_features.npy".format(data_name))
                 # np.save(feature_save_path, features.cpu().numpy())
+                features = features.max(1)[1].data.cpu().numpy()
 
                 pred = pred.max(1)[1].data.cpu().numpy()
                 np.save(pred_save_path, pred)
@@ -290,7 +291,8 @@ class SemSegTester(TesterBase):
                 )
                 # save the features (n, 64)
                 feature_save_path = os.path.join(save_path, "{}_features.npy".format(data_name))
-                np.save(feature_save_path, features.cpu().numpy())
+                np.save(feature_save_path, features)
+                
             elif self.cfg.data.test.type == "NuScenesDataset":
                 np.array(pred + 1).astype(np.uint8).tofile(
                     os.path.join(
