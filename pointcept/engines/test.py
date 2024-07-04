@@ -212,7 +212,7 @@ class SemSegTester(TesterBase):
                 # Save features
                 # feature_save_path = os.path.join(save_path, "{}_features.npy".format(data_name))
                 # np.save(feature_save_path, features.cpu().numpy())
-                features = features.max(1)[1].data.cpu().numpy()
+                features = features.data.cpu().numpy()
 
                 pred = pred.max(1)[1].data.cpu().numpy()
                 np.save(pred_save_path, pred)
