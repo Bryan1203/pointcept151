@@ -210,8 +210,8 @@ class SemSegTester(TesterBase):
                         )
                     )
                 # Save features
-                feature_save_path = os.path.join(save_path, "{}_features.npy".format(data_name))
-                np.save(feature_save_path, features.cpu().numpy())
+                # feature_save_path = os.path.join(save_path, "{}_features.npy".format(data_name))
+                # np.save(feature_save_path, features.cpu().numpy())
 
                 pred = pred.max(1)[1].data.cpu().numpy()
                 np.save(pred_save_path, pred)
@@ -219,6 +219,7 @@ class SemSegTester(TesterBase):
             if "origin_segment" in data_dict.keys():
                 assert "inverse" in data_dict.keys()
                 pred = pred[data_dict["inverse"]]
+                features = features[data_dict["inverse"]]
                 segment = data_dict["origin_segment"]
             intersection, union, target = intersection_and_union(
                 pred, segment, self.cfg.data.num_classes, self.cfg.data.ignore_index
@@ -287,6 +288,9 @@ class SemSegTester(TesterBase):
                         f"{frame_name}.label",
                     )
                 )
+                # save the features (n, 64)
+                feature_save_path = os.path.join(save_path, "{}_features.npy".format(data_name))
+                np.save(feature_save_path, features.cpu().numpy())
             elif self.cfg.data.test.type == "NuScenesDataset":
                 np.array(pred + 1).astype(np.uint8).tofile(
                     os.path.join(
