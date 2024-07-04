@@ -118,6 +118,13 @@ class SemSegTester(TesterBase):
         logger = get_root_logger()
         logger.info(">>>>>>>>>>>>>>>> Start Evaluation >>>>>>>>>>>>>>>>")
 
+
+        logger.info("Model parameter names:")
+        for name, param in self.model.named_parameters():
+            logger.info(f"{name}: {param.shape}")
+
+            
+
         batch_time = AverageMeter()
         intersection_meter = AverageMeter()
         union_meter = AverageMeter()
