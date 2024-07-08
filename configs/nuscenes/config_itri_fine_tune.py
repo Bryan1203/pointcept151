@@ -28,7 +28,7 @@ train = dict(type='DefaultTrainer')
 test = dict(type='SemSegTester', verbose=True)
 model = dict(
     type='DefaultSegmentorV2',
-    num_classes=2,
+    num_classes=3,
     backbone_out_channels=64,
     backbone=dict(
         type='PT-v3m1',
@@ -83,7 +83,7 @@ scheduler = dict(
 ignore_index = -1
 names = ['background','road_line','pole']
 data = dict(
-    num_classes=2,
+    num_classes=3,
     ignore_index=-1,
     names=['background','road_line','pole'],
     train=dict(
