@@ -15,7 +15,7 @@ enable_amp = False
 empty_cache = False
 find_unused_parameters = False
 mix_prob = 0.8
-param_dicts = [dict(keyword='block', lr=0.0002)]
+param_dicts = [dict(keyword='block', lr=0.002)]
 hooks = [
     dict(type="CheckpointLoader", keywords="module.seg_head.", replacement="module.seg_head_duplicate."),
     dict(type='IterationTimer', warmup_iter=2),
@@ -70,7 +70,7 @@ model = dict(
             loss_weight=1.0,
             ignore_index=-1)
     ])
-optimizer = dict(type='AdamW', lr=0.0002, weight_decay=0.005)
+optimizer = dict(type='AdamW', lr=0.002, weight_decay=0.005)
 scheduler = dict(
     type='OneCycleLR',
     max_lr=[0.002, 0.0002],
