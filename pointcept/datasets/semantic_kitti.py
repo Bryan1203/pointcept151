@@ -125,7 +125,7 @@ class SemanticKITTIDataset(DefaultDataset):
             # 257: 4,  # "moving-bus" mapped to "other-vehicle" -------------------mapped
             # 258: 3,  # "moving-truck" to "truck" --------------------------------mapped
             # 259: 4,  # "moving-other"-vehicle to "other-vehicle" ----------------mapped
-            0: ignore_index,  # "unlabeled"
+            # 0: 0,  # "unlabeled"
             1: 1,  # "outlier" mapped to "unlabeled" --------------------------mapped
             2: 2,
         }
@@ -155,7 +155,7 @@ class SemanticKITTIDataset(DefaultDataset):
             # 17: 80,  # "pole"
             # 18: 81,  # "traffic-sign"
             ignore_index: ignore_index,
-            0: 0,
+            # 0: 0,
             1: 1,
             2: 2,
         }
