@@ -39,8 +39,8 @@ class SemanticKITTIDataset(DefaultDataset):
     def get_data_list(self):
         split2seq = dict(
             train=[5,8,9],
-            val=[10],
-            test=[10],
+            val=[21],
+            test=[21],
         )
         if isinstance(self.split, str):
             seq_list = split2seq[self.split]
