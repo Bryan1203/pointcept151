@@ -155,6 +155,7 @@ class SemanticKITTIDataset(DefaultDataset):
             # 17: 80,  # "pole"
             # 18: 81,  # "traffic-sign"
             ignore_index: ignore_index,
+            0: 0,
             1: 1,
             2: 2,
         }
