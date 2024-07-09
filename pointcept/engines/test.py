@@ -227,7 +227,7 @@ class SemSegTester(TesterBase):
                             idx + 1,
                             len(self.test_loader),
                             data_name=data_name,
-                            batch_idx=i,
+                            batch_idx=batch_idx,
                             batch_num=total_batches,
                         )
                     )
