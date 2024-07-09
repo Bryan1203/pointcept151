@@ -119,9 +119,9 @@ class SemSegTester(TesterBase):
         logger.info(">>>>>>>>>>>>>>>> Start Evaluation >>>>>>>>>>>>>>>>")
 
 
-        logger.info("Model parameter names:")
-        for name, param in self.model.named_parameters():
-            logger.info(f"{name}: {param.shape}")
+        # logger.info("Model parameter names:")
+        # for name, param in self.model.named_parameters():
+        #     logger.info(f"{name}: {param.shape}")
 
 
 
@@ -186,8 +186,8 @@ class SemSegTester(TesterBase):
                 pred = torch.zeros((segment.size, self.cfg.data.num_classes)).cuda()
                 features = torch.zeros((segment.size, 64)).cuda()  # Initialize feature tensor
                 fragment_batch_size = 2
-                for i in range(len(fragment_list/fragment_batch_size)):
-                    # fragment_batch_size = 2
+                for i in range(0, len(fragment_list), fragment_batch_size):
+                    #fragment_batch_size = 2
                     s_i, e_i = i * fragment_batch_size, min(
                         (i + 1) * fragment_batch_size, len(fragment_list)
                     )
