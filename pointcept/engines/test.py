@@ -185,12 +185,15 @@ class SemSegTester(TesterBase):
             else:
                 pred = torch.zeros((segment.size, self.cfg.data.num_classes)).cuda()
                 features = torch.zeros((segment.size, 64)).cuda()  # Initialize feature tensor
+
                 fragment_batch_size = 4
-                for i in range(0, len(fragment_list), fragment_batch_size):
+                total_fragments = len(fragment_list)
+                total_batches = (total_fragments + fragment_batch_size - 1) // fragment_batch_size
+
+                for batch_idx in range(total_batches):
                     #fragment_batch_size = 2
-                    s_i, e_i = i * fragment_batch_size, min(
-                        (i + 1) * fragment_batch_size, len(fragment_list)
-                    )
+                    s_i = batch_idx * fragment_batch_size
+                    e_i = min((batch_idx + 1) * fragment_batch_size, total_fragments)
 
                     if s_i >= len(fragment_list):
                         break  # No more fragments to process
@@ -225,7 +228,7 @@ class SemSegTester(TesterBase):
                             len(self.test_loader),
                             data_name=data_name,
                             batch_idx=i,
-                            batch_num=len(fragment_list),
+                            batch_num=total_batches,
                         )
                     )
                 # Save features
