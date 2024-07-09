@@ -186,7 +186,7 @@ class SemSegTester(TesterBase):
                 pred = torch.zeros((segment.size, self.cfg.data.num_classes)).cuda()
                 features = torch.zeros((segment.size, 64)).cuda()  # Initialize feature tensor
                 for i in range(len(fragment_list)):
-                    fragment_batch_size = 2
+                    fragment_batch_size = 1
                     s_i, e_i = i * fragment_batch_size, min(
                         (i + 1) * fragment_batch_size, len(fragment_list)
                     )
