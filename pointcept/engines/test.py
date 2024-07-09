@@ -191,6 +191,17 @@ class SemSegTester(TesterBase):
                     s_i, e_i = i * fragment_batch_size, min(
                         (i + 1) * fragment_batch_size, len(fragment_list)
                     )
+
+                    if s_i >= len(fragment_list):
+                        break  # No more fragments to process
+                    if s_i == e_i:
+                        continue  # Skip processing if there's no fragment in this batch
+
+                    current_batch = fragment_list[s_i:e_i]
+                    if len(current_batch) == 0:
+                        continue  # Skip empty batches
+
+
                     input_dict = collate_fn(fragment_list[s_i:e_i])
                     for key in input_dict.keys():
                         if isinstance(input_dict[key], torch.Tensor):
