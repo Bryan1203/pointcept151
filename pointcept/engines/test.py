@@ -118,6 +118,13 @@ class SemSegTester(TesterBase):
         logger = get_root_logger()
         logger.info(">>>>>>>>>>>>>>>> Start Evaluation >>>>>>>>>>>>>>>>")
 
+
+        # logger.info("Model parameter names:")
+        # for name, param in self.model.named_parameters():
+        #     logger.info(f"{name}: {param.shape}")
+
+
+
         batch_time = AverageMeter()
         intersection_meter = AverageMeter()
         union_meter = AverageMeter()
@@ -134,6 +141,10 @@ class SemSegTester(TesterBase):
             make_dirs(os.path.join(save_path, "submit"))
         elif (
             self.cfg.data.test.type == "SemanticKITTIDataset" and comm.is_main_process()
+        ):
+            make_dirs(os.path.join(save_path, "submit"))
+        elif (
+            self.cfg.data.test.type == "ItriDataset" and comm.is_main_process()
         ):
             make_dirs(os.path.join(save_path, "submit"))
         elif self.cfg.data.test.type == "NuScenesDataset" and comm.is_main_process():
@@ -173,23 +184,41 @@ class SemSegTester(TesterBase):
                 pred = np.load(pred_save_path)
             else:
                 pred = torch.zeros((segment.size, self.cfg.data.num_classes)).cuda()
-                for i in range(len(fragment_list)):
-                    fragment_batch_size = 1
-                    s_i, e_i = i * fragment_batch_size, min(
-                        (i + 1) * fragment_batch_size, len(fragment_list)
-                    )
+                features = torch.zeros((segment.size, 64)).cuda()  # Initialize feature tensor
+
+                fragment_batch_size = 8
+                total_fragments = len(fragment_list)
+                total_batches = (total_fragments + fragment_batch_size - 1) // fragment_batch_size
+
+                for batch_idx in range(total_batches):
+                    #fragment_batch_size = 2
+                    s_i = batch_idx * fragment_batch_size
+                    e_i = min((batch_idx + 1) * fragment_batch_size, total_fragments)
+
+                    if s_i >= len(fragment_list):
+                        break  # No more fragments to process
+                    if s_i == e_i:
+                        continue  # Skip processing if there's no fragment in this batch
+
+                    current_batch = fragment_list[s_i:e_i]
+                    if len(current_batch) == 0:
+                        continue  # Skip empty batches
+
+
                     input_dict = collate_fn(fragment_list[s_i:e_i])
                     for key in input_dict.keys():
                         if isinstance(input_dict[key], torch.Tensor):
                             input_dict[key] = input_dict[key].cuda(non_blocking=True)
                     idx_part = input_dict["index"]
                     with torch.no_grad():
+                        feature_part = self.model(input_dict)["backbone_features"]
                         pred_part = self.model(input_dict)["seg_logits"]  # (n, k)
                         pred_part = F.softmax(pred_part, -1)
                         if self.cfg.empty_cache:
                             torch.cuda.empty_cache()
                         bs = 0
                         for be in input_dict["offset"]:
+                            features[idx_part[bs:be], :] = feature_part[bs:be]
                             pred[idx_part[bs:be], :] += pred_part[bs:be]
                             bs = be
 
@@ -198,15 +227,22 @@ class SemSegTester(TesterBase):
                             idx + 1,
                             len(self.test_loader),
                             data_name=data_name,
-                            batch_idx=i,
-                            batch_num=len(fragment_list),
+                            batch_idx=batch_idx,
+                            batch_num=total_batches,
                         )
                     )
+                # Save features
+                # feature_save_path = os.path.join(save_path, "{}_features.npy".format(data_name))
+                # np.save(feature_save_path, features.cpu().numpy())
+                features = features.data.cpu().numpy()
+
                 pred = pred.max(1)[1].data.cpu().numpy()
                 np.save(pred_save_path, pred)
+
             if "origin_segment" in data_dict.keys():
                 assert "inverse" in data_dict.keys()
                 pred = pred[data_dict["inverse"]]
+                features = features[data_dict["inverse"]]
                 segment = data_dict["origin_segment"]
             intersection, union, target = intersection_and_union(
                 pred, segment, self.cfg.data.num_classes, self.cfg.data.ignore_index
@@ -252,7 +288,7 @@ class SemSegTester(TesterBase):
                     self.test_loader.dataset.class2id[pred].reshape([-1, 1]),
                     fmt="%d",
                 )
-            elif self.cfg.data.test.type == "SemanticKITTIDataset":
+            elif self.cfg.data.test.type == "SemanticKITTIDataset" or self.cfg.data.test.type == "ItriDataset":
                 # 00_000000 -> 00, 000000
                 sequence_name, frame_name = data_name.split("_")
                 os.makedirs(
@@ -261,11 +297,11 @@ class SemSegTester(TesterBase):
                     ),
                     exist_ok=True,
                 )
-                pred = pred.astype(np.uint32)
-                pred = np.vectorize(
+                submit = pred.astype(np.uint32)
+                submit = np.vectorize(
                     self.test_loader.dataset.learning_map_inv.__getitem__
-                )(pred).astype(np.uint32)
-                pred.tofile(
+                )(submit).astype(np.uint32)
+                submit.tofile(
                     os.path.join(
                         save_path,
                         "submit",
@@ -275,6 +311,10 @@ class SemSegTester(TesterBase):
                         f"{frame_name}.label",
                     )
                 )
+                # save the features (n, 64)
+                feature_save_path = os.path.join(save_path, "{}_features.npy".format(data_name))
+                np.save(feature_save_path, features)
+                
             elif self.cfg.data.test.type == "NuScenesDataset":
                 np.array(pred + 1).astype(np.uint8).tofile(
                     os.path.join(
