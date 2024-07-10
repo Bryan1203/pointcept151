@@ -150,7 +150,7 @@ data = dict(
                 keys=('coord', 'strength', 'segment'),
                 return_inverse=True)
         ],
-        test_mode=True,
+        test_mode=False,
         test_cfg=dict(
             voxelize=dict(
                 type='GridSample',
