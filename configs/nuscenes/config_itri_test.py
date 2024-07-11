@@ -89,7 +89,7 @@ data = dict(
     train=dict(
         type='SemanticKITTIDataset',
         split='train',
-        data_root='data/itri',
+        data_root='/media/changbryan/BC_T7/itriDataset/itri_68_nanliao',
         transform=[
             dict(
                 type='RandomRotate',
@@ -119,7 +119,7 @@ data = dict(
     val=dict(
         type='SemanticKITTIDataset',
         split='val',
-        data_root='data/itri',
+        data_root='/media/changbryan/BC_T7/itriDataset/itri_68_nanliao',
         transform=[
             dict(
                 type='GridSample',
@@ -139,7 +139,7 @@ data = dict(
     test=dict(
         type='SemanticKITTIDataset',
         split='val',
-        data_root='data/itri',
+        data_root='/media/changbryan/BC_T7/itriDataset/itri_68_nanliao',
         transform=[
             dict(type='Copy', keys_dict=dict(segment='origin_segment')),
             dict(
