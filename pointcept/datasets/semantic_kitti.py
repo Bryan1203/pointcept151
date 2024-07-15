@@ -17,7 +17,7 @@ class SemanticKITTIDataset(DefaultDataset):
     def __init__(
         self,
         split="train",
-        data_root="/media/changbryan/BC_T7/itriDataset/itri_68_nanliao",
+        data_root="/media/changbryan/BC_T7/itriDataset/taoyuan",
         transform=None,
         test_mode=False,
         test_cfg=None,
@@ -38,9 +38,9 @@ class SemanticKITTIDataset(DefaultDataset):
 
     def get_data_list(self):
         split2seq = dict(
-            train=[5,6,8,9],
-            val=[2,3,4,5,6,7,8,9,10],
-            test=[2,3,4,5,6,7,8,9,10],
+            train=[0],
+            val=[1],
+            test=[1],
         )
         if isinstance(self.split, str):
             seq_list = split2seq[self.split]
@@ -126,8 +126,24 @@ class SemanticKITTIDataset(DefaultDataset):
             # 258: 3,  # "moving-truck" to "truck" --------------------------------mapped
             # 259: 4,  # "moving-other"-vehicle to "other-vehicle" ----------------mapped
             0: 0,  # "unlabeled"
-            1: 1,  # "outlier" mapped to "unlabeled" --------------------------mapped
+            1: 1,  
             2: 2,
+            3: 3,
+            4: 4,
+            5: 5,
+            6: 6,
+            11: 7,
+            12: 8,
+            13: 9,
+            14: 10,
+            15: 11,
+            16: 12,
+            21: 13,
+            22: 14,
+            23: 15,
+            24: 16,
+            25: 17,
+            26: 18,
         }
         return learning_map
 
@@ -155,8 +171,24 @@ class SemanticKITTIDataset(DefaultDataset):
             # 17: 80,  # "pole"
             # 18: 81,  # "traffic-sign"
             ignore_index: ignore_index,
-            0: 0,
-            1: 1,
+            0: 0,  # "unlabeled"
+            1: 1,  
             2: 2,
+            3: 3,
+            4: 4,
+            5: 5,
+            6: 6,
+            7: 11,
+            8: 12,
+            9: 13,
+            10: 14,
+            11: 15,
+            12: 16,
+            13: 21,
+            14: 22,
+            15: 23,
+            16: 24,
+            17: 25,
+            18: 26,
         }
         return learning_map_inv

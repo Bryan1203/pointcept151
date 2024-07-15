@@ -8,8 +8,8 @@ num_worker = 48
 batch_size = 1
 batch_size_val = None
 batch_size_test = None
-epoch = 20
-eval_epoch = 20
+epoch = 40
+eval_epoch = 40
 sync_bn = False
 enable_amp = False
 empty_cache = False
@@ -28,7 +28,7 @@ train = dict(type='DefaultTrainer')
 test = dict(type='SemSegTester', verbose=True)
 model = dict(
     type='DefaultSegmentorV2',
-    num_classes=3,
+    num_classes=19,
     backbone_out_channels=64,
     backbone=dict(
         type='PT-v3m1',
@@ -81,15 +81,19 @@ scheduler = dict(
 # dataset_type = 'NuScenesDataset'
 # data_root = 'data/nuscenes'
 ignore_index = -1
-names = ['background','road_line','pole']
+names = ['background','white_solid','white_broken','white_solid_solid','white_solid_broken','white_broken_solid','white_broken_broken',
+         'yellow_solid','yellow_broken','yellow_solid_solid','yellow_solid_broken','yellow_broken_solid','yellow_broken_broken',
+         'red_solid','red_broken','red_solid_solid','red_broken','red_solid','red_broken_broken']
 data = dict(
-    num_classes=3,
+    num_classes=19,
     ignore_index=-1,
-    names=['background','road_line','pole'],
+    names=['background','white_solid','white_broken','white_solid_solid','white_solid_broken','white_broken_solid','white_broken_broken',
+         'yellow_solid','yellow_broken','yellow_solid_solid','yellow_solid_broken','yellow_broken_solid','yellow_broken_broken',
+         'red_solid','red_broken','red_solid_solid','red_broken','red_solid','red_broken_broken'],
     train=dict(
         type='SemanticKITTIDataset',
         split='train',
-        data_root='data/itri',
+        data_root='/media/changbryan/BC_T7/itriDataset/taoyuan',
         transform=[
             dict(
                 type='RandomRotate',
@@ -119,7 +123,7 @@ data = dict(
     val=dict(
         type='SemanticKITTIDataset',
         split='val',
-        data_root='data/itri',
+        data_root='/media/changbryan/BC_T7/itriDataset/taoyuan',
         transform=[
             dict(
                 type='GridSample',
@@ -139,7 +143,7 @@ data = dict(
     test=dict(
         type='SemanticKITTIDataset',
         split='val',
-        data_root='data/itri',
+        data_root='/media/changbryan/BC_T7/itriDataset/taoyuan',
         transform=[
             dict(type='Copy', keys_dict=dict(segment='origin_segment')),
             dict(
