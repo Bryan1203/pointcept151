@@ -81,11 +81,15 @@ scheduler = dict(
 # dataset_type = 'NuScenesDataset'
 data_root='/media/changbryan/BC_T7/itriDataset/taoyuan'
 ignore_index = -1
-names = ['background','road_line','pole']
+names = ['background','white_solid','white_broken','white_solid_solid','white_solid_broken','white_broken_solid','white_broken_broken',
+         'yellow_solid','yellow_broken','yellow_solid_solid','yellow_solid_broken','yellow_broken_solid','yellow_broken_broken',
+         'red_solid','red_broken','red_solid_solid','red_broken','red_solid','red_broken_broken']
 data = dict(
-    num_classes=3,
+    num_classes=19,
     ignore_index=-1,
-    names=['background','road_line','pole'],
+    names=['background','white_solid','white_broken','white_solid_solid','white_solid_broken','white_broken_solid','white_broken_broken',
+         'yellow_solid','yellow_broken','yellow_solid_solid','yellow_solid_broken','yellow_broken_solid','yellow_broken_broken',
+         'red_solid','red_broken','red_solid_solid','red_broken','red_solid','red_broken_broken'],
     train=dict(
         type='SemanticKITTIDataset',
         split='train',
