@@ -170,7 +170,8 @@ class SemSegTester(TesterBase):
                         idx + 1, len(self.test_loader), data_name
                     )
                 )
-                pred = np.load(pred_save_path)
+                continue
+                #pred = np.load(pred_save_path)
             else:
                 pred = torch.zeros((segment.size, self.cfg.data.num_classes)).cuda()
                 for i in range(len(fragment_list)):
