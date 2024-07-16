@@ -124,6 +124,11 @@ If you find _Pointcept_ useful to your research, please cite our work as encoura
 ### Conda Environment
 
 ```bash
+# cuda 11.8 and install nvidia driver 535.183.01
+wget https://developer.download.nvidia.com/compute/cuda/11.8.0/local_installers/cuda_11.8.0_520.61.05_linux.run
+sudo sh cuda_11.8.0_520.61.05_linux.run
+
+
 conda create -n pointcept python=3.8 -y
 conda activate pointcept
 conda install ninja -y
@@ -137,7 +142,7 @@ pip install torch-geometric
 
 # spconv (SparseUNet)
 # refer https://github.com/traveller59/spconv
-pip install spconv-cu113
+pip install spconv-cu118
 
 # PTv1 & PTv2 or precise eval
 cd libs/pointops
