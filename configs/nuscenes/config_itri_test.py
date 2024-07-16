@@ -79,7 +79,7 @@ scheduler = dict(
     div_factor=10.0,
     final_div_factor=100.0)
 # dataset_type = 'NuScenesDataset'
-data_root="/media/changbryan/BC_T7/itriDataset/taoyuan_whole_drive"
+data_root="/media/changbryan/BC_T7/itriDataset/itri_68_nanliao"
 ignore_index = -1
 names = ['background','white_solid','white_broken','white_solid_solid','white_solid_broken','white_broken_solid','white_broken_broken',
          'yellow_solid','yellow_broken','yellow_solid_solid','yellow_solid_broken','yellow_broken_solid','yellow_broken_broken',
