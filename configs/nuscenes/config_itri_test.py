@@ -79,7 +79,7 @@ scheduler = dict(
     div_factor=10.0,
     final_div_factor=100.0)
 # dataset_type = 'NuScenesDataset'
-# data_root = 'data/nuscenes'
+data_root='/media/changbryan/BC_T7/itriDataset/taoyuan'
 ignore_index = -1
 names = ['background','road_line','pole']
 data = dict(
@@ -89,7 +89,7 @@ data = dict(
     train=dict(
         type='SemanticKITTIDataset',
         split='train',
-        data_root='/media/changbryan/BC_T7/itriDataset/itri_68_nanliao',
+        data_root=data_root,
         transform=[
             dict(
                 type='RandomRotate',
@@ -119,7 +119,7 @@ data = dict(
     val=dict(
         type='SemanticKITTIDataset',
         split='val',
-        data_root='/media/changbryan/BC_T7/itriDataset/itri_68_nanliao',
+        data_root=data_root,
         transform=[
             dict(
                 type='GridSample',
@@ -139,7 +139,7 @@ data = dict(
     test=dict(
         type='SemanticKITTIDataset',
         split='val',
-        data_root='/media/changbryan/BC_T7/itriDataset/itri_68_nanliao',
+        data_root=data_root,
         transform=[
             dict(type='Copy', keys_dict=dict(segment='origin_segment')),
             dict(
