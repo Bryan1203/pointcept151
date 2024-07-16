@@ -28,7 +28,7 @@ train = dict(type='DefaultTrainer')
 test = dict(type='SemSegTester', verbose=True)
 model = dict(
     type='DefaultSegmentorV2',
-    num_classes=3,
+    num_classes=19,
     backbone_out_channels=64,
     backbone=dict(
         type='PT-v3m1',
