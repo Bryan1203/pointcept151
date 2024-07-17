@@ -17,7 +17,7 @@ class SemanticKITTIDataset(DefaultDataset):
     def __init__(
         self,
         split="train",
-        data_root="/media/changbryan/BC_T7/itriDataset/taoyuan",
+        data_root="/media/changbryan/BC_T7/itriDataset/itri_68_nanliao",
         transform=None,
         test_mode=False,
         test_cfg=None,
@@ -39,8 +39,8 @@ class SemanticKITTIDataset(DefaultDataset):
     def get_data_list(self):
         split2seq = dict(
             train=[0,2],
-            val=[0],
-            test=[0],
+            val=[0,1,2,3,4,5,6,7,8,9,10],
+            test=[0,1,2,3,4,5,6,7,8,9,10],
         )
         if isinstance(self.split, str):
             seq_list = split2seq[self.split]
