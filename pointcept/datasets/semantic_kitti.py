@@ -17,7 +17,7 @@ class SemanticKITTIDataset(DefaultDataset):
     def __init__(
         self,
         split="train",
-        data_root="/media/changbryan/BC_T7/itriDataset/itri_68_nanliao",
+        data_root="/media/changbryan/BC_T7/itriDataset/",
         transform=None,
         test_mode=False,
         test_cfg=None,
