@@ -38,9 +38,9 @@ class SemanticKITTIDataset(DefaultDataset):
 
     def get_data_list(self):
         split2seq = dict(
-            train=[0,2],
-            val=[0,1,2,3,4,5,6,7,8,9,10],
-            test=[0,1,2,3,4,5,6,7,8,9,10],
+            train=[0,1,3,4,6,7,8,10,12,13],
+            val=[2,5,9,11],
+            test=[0,1,2,3,4,5,6,7,8,9,10,11,12,13],
         )
         if isinstance(self.split, str):
             seq_list = split2seq[self.split]
@@ -126,24 +126,31 @@ class SemanticKITTIDataset(DefaultDataset):
             # 258: 3,  # "moving-truck" to "truck" --------------------------------mapped
             # 259: 4,  # "moving-other"-vehicle to "other-vehicle" ----------------mapped
             0: 0,  # "unlabeled"
-            1: 1,  
-            2: 2,
+            1: 2,  
+            2: 1,
             3: 3,
-            4: 4,
-            5: 5,
-            6: 6,
-            11: 7,
-            12: 8,
-            13: 9,
-            14: 10,
-            15: 11,
-            16: 12,
-            21: 13,
-            22: 14,
-            23: 15,
-            24: 16,
-            25: 17,
-            26: 18,
+            4: 1,
+            5: 1,
+            6: 1,
+            11: 2,
+            12: 1,
+            13: 3,
+            14: 1,
+            15: 1,
+            16: 1,
+            21: 2,
+            22: 1,
+            23: 3,
+            24: 1,
+            25: 1,
+            26: 1,
+            41: 1,
+            42: 2,
+            43: 3,
+            44: 4,
+            45: 5,
+            46: 6,
+            47: 7,
         }
         return learning_map
 

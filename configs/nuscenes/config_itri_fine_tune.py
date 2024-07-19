@@ -28,7 +28,7 @@ train = dict(type='DefaultTrainer')
 test = dict(type='SemSegTester', verbose=True)
 model = dict(
     type='DefaultSegmentorV2',
-    num_classes=19,
+    num_classes=4,
     backbone_out_channels=64,
     backbone=dict(
         type='PT-v3m1',
@@ -81,19 +81,15 @@ scheduler = dict(
 # dataset_type = 'NuScenesDataset'
 # data_root = 'data/nuscenes'
 ignore_index = -1
-names = ['background','white_solid','white_broken','white_solid_solid','white_solid_broken','white_broken_solid','white_broken_broken',
-         'yellow_solid','yellow_broken','yellow_solid_solid','yellow_solid_broken','yellow_broken_solid','yellow_broken_broken',
-         'red_solid','red_broken','red_solid_solid','red_broken','red_solid','red_broken_broken']
+names = ['background','dashed','solid','double']
 data = dict(
-    num_classes=19,
+    num_classes=4,
     ignore_index=-1,
-    names=['background','white_solid','white_broken','white_solid_solid','white_solid_broken','white_broken_solid','white_broken_broken',
-         'yellow_solid','yellow_broken','yellow_solid_solid','yellow_solid_broken','yellow_broken_solid','yellow_broken_broken',
-         'red_solid','red_broken','red_solid_solid','red_broken','red_solid','red_broken_broken'],
+    names = ['background','dashed','solid','double'],
     train=dict(
         type='SemanticKITTIDataset',
         split='train',
-        data_root='/media/changbryan/BC_T7/itriDataset/taoyuan',
+        data_root='/media/changbryan/BC_T7/itriDataset/nanliao_and_taoyuan',
         transform=[
             dict(
                 type='RandomRotate',
