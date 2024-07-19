@@ -126,31 +126,35 @@ class SemanticKITTIDataset(DefaultDataset):
             # 258: 3,  # "moving-truck" to "truck" --------------------------------mapped
             # 259: 4,  # "moving-other"-vehicle to "other-vehicle" ----------------mapped
             0: 0,  # "unlabeled"
+
             1: 2,  
             2: 1,
             3: 3,
             4: 1,
             5: 1,
             6: 1,
+
             11: 2,
             12: 1,
             13: 3,
             14: 1,
             15: 1,
             16: 1,
+
             21: 2,
             22: 1,
             23: 3,
             24: 1,
             25: 1,
             26: 1,
+
             41: 1,
             42: 2,
             43: 3,
-            44: 4,
-            45: 5,
-            46: 6,
-            47: 7,
+            44: 1,
+            45: 2,
+            46: 3,
+            47: 2,
         }
         return learning_map
 
@@ -182,20 +186,5 @@ class SemanticKITTIDataset(DefaultDataset):
             1: 1,  
             2: 2,
             3: 3,
-            4: 4,
-            5: 5,
-            6: 6,
-            7: 11,
-            8: 12,
-            9: 13,
-            10: 14,
-            11: 15,
-            12: 16,
-            13: 21,
-            14: 22,
-            15: 23,
-            16: 24,
-            17: 25,
-            18: 26,
         }
         return learning_map_inv
