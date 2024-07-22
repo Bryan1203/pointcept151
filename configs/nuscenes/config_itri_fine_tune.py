@@ -138,7 +138,7 @@ data = dict(
         ignore_index=-1),
     test=dict(
         type='SemanticKITTIDataset',
-        split='val',
+        split='test',
         data_root=data_root,
         transform=[
             dict(type='Copy', keys_dict=dict(segment='origin_segment')),
