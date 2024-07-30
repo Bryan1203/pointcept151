@@ -187,6 +187,7 @@ class SemSegTester(TesterBase):
                     with torch.no_grad():
                         pred_part = self.model(input_dict)["seg_logits"]  # (n, k)
                         pred_part = F.softmax(pred_part, -1)
+                        #pred[idx_part[bs:be], :] += pred_part[bs:be]
                         if self.cfg.empty_cache:
                             torch.cuda.empty_cache()
                         bs = 0
@@ -205,9 +206,14 @@ class SemSegTester(TesterBase):
                     )
                 pred = pred.max(1)[1].data.cpu().numpy()
                 np.save(pred_save_path, pred)
+
+                #save the probability of the selected class
+                probs = pred.max(1)[0].data.cpu().numpy()
+
             if "origin_segment" in data_dict.keys():
                 assert "inverse" in data_dict.keys()
                 pred = pred[data_dict["inverse"]]
+                probs = probs[data_dict["inverse"]]
                 segment = data_dict["origin_segment"]
             intersection, union, target = intersection_and_union(
                 pred, segment, self.cfg.data.num_classes, self.cfg.data.ignore_index
@@ -276,6 +282,10 @@ class SemSegTester(TesterBase):
                         f"{frame_name}.label",
                     )
                 )
+                # save the probability of the inference class
+                prob_save_path = os.path.join(save_path, "{}_prob.npy".format(data_name))
+                np.save(prob_save_path, pred)
+
             elif self.cfg.data.test.type == "NuScenesDataset":
                 np.array(pred + 1).astype(np.uint8).tofile(
                     os.path.join(
