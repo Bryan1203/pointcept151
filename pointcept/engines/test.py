@@ -286,7 +286,7 @@ class SemSegTester(TesterBase):
                     )
                 )
                 # save the probability of the inference class
-                prob_save_path = os.path.join(save_path, "{}_prob.npy".format(data_name))
+                prob_save_path = os.path.join(save_path, "prob", "{}_prob.npy".format(data_name))
                 np.save(prob_save_path, pred)
 
             elif self.cfg.data.test.type == "NuScenesDataset":
