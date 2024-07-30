@@ -204,11 +204,14 @@ class SemSegTester(TesterBase):
                             batch_num=len(fragment_list),
                         )
                     )
+
+                #save the probability of the selected class
+                probs = pred.max(1)[0].data.cpu().numpy()
+
                 pred = pred.max(1)[1].data.cpu().numpy()
                 np.save(pred_save_path, pred)
 
-                #save the probability of the selected class
-                probs = pred.max(1).data.cpu().numpy()
+                
 
             if "origin_segment" in data_dict.keys():
                 assert "inverse" in data_dict.keys()
