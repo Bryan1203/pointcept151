@@ -79,7 +79,7 @@ scheduler = dict(
     div_factor=10.0,
     final_div_factor=100.0)
 dataset_type = 'SemanticKITTIDataset'
-data_root = '/media/changbryan/BC_T7/itriDataset/itri_68_nanliao'
+data_root = '/media/changbryan/BC_T7_2/itriDataset/itri_68_nanliao'
 ignore_index = -1
 names = [
     'barrier', 'bicycle', 'bus', 'car', 'construction_vehicle', 'motorcycle',
