@@ -69,7 +69,9 @@ class SemanticKITTIDataset(DefaultDataset):
         with open(data_path, "rb") as b:
             scan = np.fromfile(b, dtype=np.float32).reshape(-1, 4)
         coord = scan[:, :3]
-        strength = scan[:, -1].reshape([-1, 1])
+        #strength = scan[:, -1].reshape([-1, 1])
+        #modified for MT
+        strength = scan[:, -1].reshape([-1, 1])/255.
 
         label_file = data_path.replace("velodyne", "labels").replace(".bin", ".label")
         if os.path.exists(label_file):
