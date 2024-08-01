@@ -78,8 +78,8 @@ scheduler = dict(
     anneal_strategy='cos',
     div_factor=10.0,
     final_div_factor=100.0)
-dataset_type = 'NuScenesDataset'
-data_root = 'data/nuscenes'
+dataset_type = 'SemanticKITTIDataset'
+data_root = '/media/changbryan/BC_T7/itriDataset/itri_68_nanliao'
 ignore_index = -1
 names = [
     'barrier', 'bicycle', 'bus', 'car', 'construction_vehicle', 'motorcycle',
@@ -96,9 +96,9 @@ data = dict(
         'vegetation'
     ],
     train=dict(
-        type='NuScenesDataset',
+        type=dataset_type,
         split='train',
-        data_root='data/nuscenes',
+        data_root=data_root,
         transform=[
             dict(
                 type='RandomRotate',
@@ -126,9 +126,9 @@ data = dict(
         ignore_index=-1,
         loop=1),
     val=dict(
-        type='NuScenesDataset',
+        type=dataset_type,
         split='val',
-        data_root='data/nuscenes',
+        data_root=data_root,
         transform=[
             dict(
                 type='GridSample',
@@ -146,9 +146,9 @@ data = dict(
         test_mode=False,
         ignore_index=-1),
     test=dict(
-        type='SemanticKITTIDataset',
-        split='val',
-        data_root='data/itri',
+        type=dataset_type,
+        split='test',
+        data_root=data_root,
         transform=[
             dict(type='Copy', keys_dict=dict(segment='origin_segment')),
             dict(
