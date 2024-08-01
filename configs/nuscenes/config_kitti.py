@@ -176,55 +176,7 @@ data = dict(
                     keys=('coord', 'grid_coord', 'index'),
                     feat_keys=('coord', 'strength'))
             ],
-            aug_transform=[[{
-                'type': 'RandomScale',
-                'scale': [0.9, 0.9]
-            }], [{
-                'type': 'RandomScale',
-                'scale': [0.95, 0.95]
-            }], [{
-                'type': 'RandomScale',
-                'scale': [1, 1]
-            }], [{
-                'type': 'RandomScale',
-                'scale': [1.05, 1.05]
-            }], [{
-                'type': 'RandomScale',
-                'scale': [1.1, 1.1]
-            }],
-                           [{
-                               'type': 'RandomScale',
-                               'scale': [0.9, 0.9]
-                           }, {
-                               'type': 'RandomFlip',
-                               'p': 1
-                           }],
-                           [{
-                               'type': 'RandomScale',
-                               'scale': [0.95, 0.95]
-                           }, {
-                               'type': 'RandomFlip',
-                               'p': 1
-                           }],
-                           [{
-                               'type': 'RandomScale',
-                               'scale': [1, 1]
-                           }, {
-                               'type': 'RandomFlip',
-                               'p': 1
-                           }],
-                           [{
-                               'type': 'RandomScale',
-                               'scale': [1.05, 1.05]
-                           }, {
-                               'type': 'RandomFlip',
-                               'p': 1
-                           }],
-                           [{
-                               'type': 'RandomScale',
-                               'scale': [1.1, 1.1]
-                           }, {
-                               'type': 'RandomFlip',
-                               'p': 1
-                           }]]),
+            aug_transform = [
+                [dict(type="RandomRotateTargetAngle", angle=[0], axis="z", center=[0, 0, 0], p=1)]
+            ]),
         ignore_index=-1))
