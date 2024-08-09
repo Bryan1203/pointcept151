@@ -356,8 +356,51 @@ class SemSegTester(TesterBase):
 
     @staticmethod
     def collate_fn(batch):
-        print("batch: ", batch)
-        return batch
+        #print("batch: ", batch)
+        return point_collate_fn(batch)
+    
+from torch.utils.data.dataloader import default_collate
+
+def point_collate_fn(batch):
+    """
+    Custom collate function for point cloud data in the tester.
+    
+    Args:
+        batch: A list of dictionaries, each representing a single sample.
+    
+    Returns:
+        A dictionary with batched data.
+    """
+    # Separate 'fragment_list' and other data
+    fragment_lists = [item.pop('fragment_list') for item in batch]
+    
+    # Collate other items
+    batched = default_collate(batch)
+    
+    # Handle 'fragment_list' separately
+    max_fragments = max(len(frags) for frags in fragment_lists)
+    batched_fragments = []
+    
+    for i in range(max_fragments):
+        fragment_batch = [frags[i] if i < len(frags) else {} for frags in fragment_lists]
+        # Collate this batch of fragments
+        batched_fragments.append(default_collate(fragment_batch))
+    
+    batched['fragment_list'] = batched_fragments
+    
+    # Print batch information for debugging
+    print(f"Collated batch size: {len(batch)}")
+    for key, value in batched.items():
+        if isinstance(value, torch.Tensor):
+            print(f"  Shape of {key}: {value.shape}")
+        elif isinstance(value, list):
+            print(f"  Length of {key}: {len(value)}")
+            if len(value) > 0 and isinstance(value[0], dict):
+                for subkey, subvalue in value[0].items():
+                    if isinstance(subvalue, torch.Tensor):
+                        print(f"    Shape of fragment {subkey}: {subvalue.shape}")
+    
+    return batched
 
 @TESTERS.register_module()
 class ClsTester(TesterBase):
