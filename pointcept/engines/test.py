@@ -158,8 +158,10 @@ class SemSegTester(TesterBase):
         record = {}
         # fragment inference
         for idx, data_dict in enumerate(self.test_loader):
+            logger.info(f"Processing batch {idx+1}/{len(self.test_loader)}")
             end = time.time()
             data_dict = data_dict[0]  # current assume batch size is 1
+            
             fragment_list = data_dict.pop("fragment_list")
             segment = data_dict.pop("segment")
             data_name = data_dict.pop("name")
