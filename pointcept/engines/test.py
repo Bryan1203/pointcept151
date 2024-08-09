@@ -161,12 +161,29 @@ class SemSegTester(TesterBase):
         # fragment inference
         for idx, data_dict in enumerate(self.test_loader):
             end = time.time()
-            data_dict = data_dict[0]  # current assume batch size is 1
             
+            logger.info(f"Processing batch {idx+1}/{len(self.test_loader)}")
+            
+            # Print information about the batch
+            for key, value in data_dict.items():
+                if isinstance(value, torch.Tensor):
+                    logger.info(f"  Shape of {key}: {value.shape}")
+                elif isinstance(value, list):
+                    logger.info(f"  Length of {key}: {len(value)}")
+                    if len(value) > 0 and isinstance(value[0], dict):
+                        for subkey, subvalue in value[0].items():
+                            if isinstance(subvalue, torch.Tensor):
+                                logger.info(f"    Shape of fragment {subkey}: {subvalue.shape}")
+
+            # Extract required data
             fragment_list = data_dict.pop("fragment_list")
             segment = data_dict.pop("segment")
-            logger.info(f"segement size: {segment.shape}")
-            data_name = data_dict.pop("name")
+            data_name = data_dict.pop("name")[0]  # Assuming it's a list with one item
+            
+            logger.info(f"  Data name: {data_name}")
+            logger.info(f"  Segment shape: {segment.shape}")
+            logger.info(f"  Number of fragments: {len(fragment_list)}")
+
             pred_save_path = os.path.join(save_path, "{}_pred.npy".format(data_name))
             if os.path.isfile(pred_save_path):
                 logger.info(
@@ -175,37 +192,31 @@ class SemSegTester(TesterBase):
                     )
                 )
                 continue
-                #pred = np.load(pred_save_path)
             else:
-                pred = torch.zeros((segment.size, self.cfg.data.num_classes)).cuda()
-                for i in range(len(fragment_list)):
-                    fragment_batch_size = 1
-                    s_i, e_i = i * fragment_batch_size, min(
-                        (i + 1) * fragment_batch_size, len(fragment_list)
-                    )
-                    input_dict = collate_fn(fragment_list[s_i:e_i])
-                    for key in input_dict.keys():
-                        if isinstance(input_dict[key], torch.Tensor):
-                            input_dict[key] = input_dict[key].cuda(non_blocking=True)
-                    idx_part = input_dict["index"]
+                pred = torch.zeros((segment.shape[1], self.cfg.data.num_classes)).cuda()
+                for i, fragment in enumerate(fragment_list):
+                    # Move fragment to GPU
+                    for key, value in fragment.items():
+                        if isinstance(value, torch.Tensor):
+                            fragment[key] = value.cuda(non_blocking=True)
+
                     with torch.no_grad():
-                        pred_part = self.model(input_dict)["seg_logits"]  # (n, k)
+                        pred_part = self.model(fragment)["seg_logits"]  # (n, k)
                         pred_part = F.softmax(pred_part, -1)
-                        #pred[idx_part[bs:be], :] += pred_part[bs:be]
-                        if self.cfg.empty_cache:
-                            torch.cuda.empty_cache()
-                        bs = 0
-                        for be in input_dict["offset"]:
-                            pred[idx_part[bs:be], :] += pred_part[bs:be]
-                            bs = be
+                    
+                    if self.cfg.empty_cache:
+                        torch.cuda.empty_cache()
+                    
+                    idx_part = fragment["index"].squeeze(0)  # Remove batch dimension
+                    pred[idx_part, :] += pred_part.squeeze(0)  # Remove batch dimension
 
                     logger.info(
-                        "Test: {}/{}-{data_name}, Batch: {batch_idx}/{batch_num}".format(
+                        "Test: {}/{}-{data_name}, Fragment: {frag_idx}/{frag_num}".format(
                             idx + 1,
                             len(self.test_loader),
                             data_name=data_name,
-                            batch_idx=i,
-                            batch_num=len(fragment_list),
+                            frag_idx=i+1,
+                            frag_num=len(fragment_list),
                         )
                     )
 
