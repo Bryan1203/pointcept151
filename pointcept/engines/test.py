@@ -356,7 +356,8 @@ class SemSegTester(TesterBase):
 
     @staticmethod
     def collate_fn(batch):
-        return collate_fn(batch)
+        print("batch: ", batch)
+        return batch
 
 @TESTERS.register_module()
 class ClsTester(TesterBase):
