@@ -16,7 +16,7 @@ import torch.utils.data
 
 from .defaults import create_ddp_model
 import pointcept.utils.comm as comm
-from pointcept.datasets import build_dataset, collate_fn
+from pointcept.datasets import build_dataset, collate_fn, point_collate_fn
 from pointcept.models import build_model
 from pointcept.utils.logger import get_root_logger
 from pointcept.utils.registry import Registry
@@ -100,7 +100,7 @@ class TesterBase:
             pin_memory=True,
             sampler=test_sampler,
             #collate_fn=self.__class__.collate_fn,
-            collate_fn=collate_fn,
+            collate_fn=point_collate_fn,
         )
         return test_loader
 
