@@ -26,7 +26,7 @@ from pointcept.utils.misc import (
     intersection_and_union_gpu,
     make_dirs,
 )
-from .utils import collate_fn, point_collate_fn
+from pointcept.datasets import build_dataset, collate_fn, point_collate_fn
 
 TESTERS = Registry("testers")
 
@@ -333,5 +333,3 @@ class SemSegTester(TesterBase):
     @staticmethod
     def collate_fn(batch):
         return point_collate_fn(batch)
-
-# ... (rest of the file remains the same)
