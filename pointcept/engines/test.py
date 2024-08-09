@@ -158,12 +158,12 @@ class SemSegTester(TesterBase):
         record = {}
         # fragment inference
         for idx, data_dict in enumerate(self.test_loader):
-            logger.info(f"Processing batch {idx+1}/{len(self.test_loader)}")
             end = time.time()
             data_dict = data_dict[0]  # current assume batch size is 1
             
             fragment_list = data_dict.pop("fragment_list")
             segment = data_dict.pop("segment")
+            logger.info(f"segement size: {segment.shape}")
             data_name = data_dict.pop("name")
             pred_save_path = os.path.join(save_path, "{}_pred.npy".format(data_name))
             if os.path.isfile(pred_save_path):
