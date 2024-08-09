@@ -93,12 +93,12 @@ class TesterBase:
             test_sampler = None
         test_loader = torch.utils.data.DataLoader(
             test_dataset,
-            batch_size=2,  # Changed to batch size 2
+            batch_size=1,  # Changed to batch size 2
             shuffle=False,
             num_workers=self.cfg.batch_size_test_per_gpu,
             pin_memory=True,
             sampler=test_sampler,
-            collate_fn=point_collate_fn,  # Using point_collate_fn
+            collate_fn=collate_fn,  # Using point_collate_fn
         )
         return test_loader
 
