@@ -356,33 +356,7 @@ class SemSegTester(TesterBase):
 
     @staticmethod
     def collate_fn(batch):
-        return point_collate_fn(batch)
-
-def point_collate_fn(batch, mix_prob=0):
-    assert isinstance(batch[0], Mapping)
-    
-    # Separate the 'coord' and other data
-    coords = [b['coord'] for b in batch]
-    others = [{k: v for k, v in b.items() if k != 'coord'} for b in batch]
-    
-    # Collate other data
-    batched_others = collate_fn(others)
-    
-    # Handle 'coord' separately
-    batched_coords = torch.cat(coords, dim=0)
-    
-    # Calculate offsets
-    offsets = torch.tensor([c.shape[0] for c in coords], dtype=torch.int32)
-    offsets = torch.cumsum(offsets, dim=0)
-    
-    # Combine everything
-    batched = {
-        'coord': batched_coords,
-        'offset': offsets,
-        **batched_others
-    }
-    
-    return batched
+        return collate_fn(batch)
 
 @TESTERS.register_module()
 class ClsTester(TesterBase):
