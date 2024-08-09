@@ -14,6 +14,7 @@ import torch.distributed as dist
 import torch.nn.functional as F
 import torch.utils.data
 from functools import partial
+from collections.abc import Mapping, Sequence
 
 from .defaults import create_ddp_model
 import pointcept.utils.comm as comm
