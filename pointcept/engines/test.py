@@ -114,7 +114,7 @@ class TesterBase:
 @TESTERS.register_module()
 class SemSegTester(TesterBase):
     def test(self):
-        assert self.test_loader.batch_size == 1
+        #assert self.test_loader.batch_size == 1
         logger = get_root_logger()
         logger.info(">>>>>>>>>>>>>>>> Start Evaluation >>>>>>>>>>>>>>>>")
 
@@ -157,154 +157,154 @@ class SemSegTester(TesterBase):
         comm.synchronize()
         record = {}
         # fragment inference
-        for idx, data_dict in enumerate(self.test_loader):
+        for idx, data_dict_batch in enumerate(self.test_loader):
             end = time.time()
-            data_dict = data_dict[0]  # current assume batch size is 1
-            fragment_list = data_dict.pop("fragment_list")
-            segment = data_dict.pop("segment")
-            data_name = data_dict.pop("name")
-            pred_save_path = os.path.join(save_path, "{}_pred.npy".format(data_name))
-            if os.path.isfile(pred_save_path):
-                logger.info(
-                    "{}/{}: {}, loaded pred and label.".format(
-                        idx + 1, len(self.test_loader), data_name
-                    )
-                )
-                continue
-                #pred = np.load(pred_save_path)
-            else:
-                pred = torch.zeros((segment.size, self.cfg.data.num_classes)).cuda()
-                for i in range(len(fragment_list)):
-                    fragment_batch_size = 1
-                    s_i, e_i = i * fragment_batch_size, min(
-                        (i + 1) * fragment_batch_size, len(fragment_list)
-                    )
-                    input_dict = collate_fn(fragment_list[s_i:e_i])
-                    for key in input_dict.keys():
-                        if isinstance(input_dict[key], torch.Tensor):
-                            input_dict[key] = input_dict[key].cuda(non_blocking=True)
-                    idx_part = input_dict["index"]
-                    with torch.no_grad():
-                        pred_part = self.model(input_dict)["seg_logits"]  # (n, k)
-                        pred_part = F.softmax(pred_part, -1)
-                        #pred[idx_part[bs:be], :] += pred_part[bs:be]
-                        if self.cfg.empty_cache:
-                            torch.cuda.empty_cache()
-                        bs = 0
-                        for be in input_dict["offset"]:
-                            pred[idx_part[bs:be], :] += pred_part[bs:be]
-                            bs = be
-
+            for data_dict in data_dict_batch:
+                fragment_list = data_dict.pop("fragment_list")
+                segment = data_dict.pop("segment")
+                data_name = data_dict.pop("name")
+                pred_save_path = os.path.join(save_path, "{}_pred.npy".format(data_name))
+                if os.path.isfile(pred_save_path):
                     logger.info(
-                        "Test: {}/{}-{data_name}, Batch: {batch_idx}/{batch_num}".format(
-                            idx + 1,
-                            len(self.test_loader),
-                            data_name=data_name,
-                            batch_idx=i,
-                            batch_num=len(fragment_list),
+                        "{}/{}: {}, loaded pred and label.".format(
+                            idx + 1, len(self.test_loader), data_name
                         )
                     )
+                    continue
+                    #pred = np.load(pred_save_path)
+                else:
+                    pred = torch.zeros((segment.size, self.cfg.data.num_classes)).cuda()
+                    for i in range(len(fragment_list)):
+                        fragment_batch_size = 1
+                        s_i, e_i = i * fragment_batch_size, min(
+                            (i + 1) * fragment_batch_size, len(fragment_list)
+                        )
+                        input_dict = collate_fn(fragment_list[s_i:e_i])
+                        for key in input_dict.keys():
+                            if isinstance(input_dict[key], torch.Tensor):
+                                input_dict[key] = input_dict[key].cuda(non_blocking=True)
+                        idx_part = input_dict["index"]
+                        with torch.no_grad():
+                            pred_part = self.model(input_dict)["seg_logits"]  # (n, k)
+                            pred_part = F.softmax(pred_part, -1)
+                            #pred[idx_part[bs:be], :] += pred_part[bs:be]
+                            if self.cfg.empty_cache:
+                                torch.cuda.empty_cache()
+                            bs = 0
+                            for be in input_dict["offset"]:
+                                pred[idx_part[bs:be], :] += pred_part[bs:be]
+                                bs = be
 
-                #save the probability of the selected class
-                probs = pred.max(1)[0].data.cpu().numpy()
+                        logger.info(
+                            "Test: {}/{}-{data_name}, Batch: {batch_idx}/{batch_num}".format(
+                                idx + 1,
+                                len(self.test_loader),
+                                data_name=data_name,
+                                batch_idx=i,
+                                batch_num=len(fragment_list),
+                            )
+                        )
 
-                pred = pred.max(1)[1].data.cpu().numpy()
-                np.save(pred_save_path, pred)
+                    #save the probability of the selected class
+                    probs = pred.max(1)[0].data.cpu().numpy()
 
-                
+                    pred = pred.max(1)[1].data.cpu().numpy()
+                    np.save(pred_save_path, pred)
 
-            if "origin_segment" in data_dict.keys():
-                assert "inverse" in data_dict.keys()
-                pred = pred[data_dict["inverse"]]
-                probs = probs[data_dict["inverse"]]
-                segment = data_dict["origin_segment"]
-            intersection, union, target = intersection_and_union(
-                pred, segment, self.cfg.data.num_classes, self.cfg.data.ignore_index
-            )
-            intersection_meter.update(intersection)
-            union_meter.update(union)
-            target_meter.update(target)
-            record[data_name] = dict(
-                intersection=intersection, union=union, target=target
-            )
+                    
 
-            mask = union != 0
-            iou_class = intersection / (union + 1e-10)
-            iou = np.mean(iou_class[mask])
-            acc = sum(intersection) / (sum(target) + 1e-10)
-
-            m_iou = np.mean(intersection_meter.sum / (union_meter.sum + 1e-10))
-            m_acc = np.mean(intersection_meter.sum / (target_meter.sum + 1e-10))
-
-            batch_time.update(time.time() - end)
-            logger.info(
-                "Test: {} [{}/{}]-{} "
-                "Batch {batch_time.val:.3f} ({batch_time.avg:.3f}) "
-                "Accuracy {acc:.4f} ({m_acc:.4f}) "
-                "mIoU {iou:.4f} ({m_iou:.4f})".format(
-                    data_name,
-                    idx + 1,
-                    len(self.test_loader),
-                    segment.size,
-                    batch_time=batch_time,
-                    acc=acc,
-                    m_acc=m_acc,
-                    iou=iou,
-                    m_iou=m_iou,
+                if "origin_segment" in data_dict.keys():
+                    assert "inverse" in data_dict.keys()
+                    pred = pred[data_dict["inverse"]]
+                    probs = probs[data_dict["inverse"]]
+                    segment = data_dict["origin_segment"]
+                intersection, union, target = intersection_and_union(
+                    pred, segment, self.cfg.data.num_classes, self.cfg.data.ignore_index
                 )
-            )
-            if (
-                self.cfg.data.test.type == "ScanNetDataset"
-                or self.cfg.data.test.type == "ScanNet200Dataset"
-            ):
-                np.savetxt(
-                    os.path.join(save_path, "submit", "{}.txt".format(data_name)),
-                    self.test_loader.dataset.class2id[pred].reshape([-1, 1]),
-                    fmt="%d",
+                intersection_meter.update(intersection)
+                union_meter.update(union)
+                target_meter.update(target)
+                record[data_name] = dict(
+                    intersection=intersection, union=union, target=target
                 )
-            elif self.cfg.data.test.type == "SemanticKITTIDataset":
-                # 00_000000 -> 00, 000000
-                sequence_name, frame_name = data_name.split("_")
-                os.makedirs(
-                    os.path.join(
-                        save_path, "submit", "sequences", sequence_name, "predictions"
-                    ),
-                    exist_ok=True,
-                )
-                pred = pred.astype(np.uint32)
-                pred = np.vectorize(
-                    self.test_loader.dataset.learning_map_inv.__getitem__
-                )(pred).astype(np.uint32)
-                pred.tofile(
-                    os.path.join(
-                        save_path,
-                        "submit",
-                        "sequences",
-                        sequence_name,
-                        "predictions",
-                        f"{frame_name}.label",
+
+                mask = union != 0
+                iou_class = intersection / (union + 1e-10)
+                iou = np.mean(iou_class[mask])
+                acc = sum(intersection) / (sum(target) + 1e-10)
+
+                m_iou = np.mean(intersection_meter.sum / (union_meter.sum + 1e-10))
+                m_acc = np.mean(intersection_meter.sum / (target_meter.sum + 1e-10))
+
+                batch_time.update(time.time() - end)
+                logger.info(
+                    "Test: {} [{}/{}]-{} "
+                    "Batch {batch_time.val:.3f} ({batch_time.avg:.3f}) "
+                    "Accuracy {acc:.4f} ({m_acc:.4f}) "
+                    "mIoU {iou:.4f} ({m_iou:.4f})".format(
+                        data_name,
+                        idx + 1,
+                        len(self.test_loader),
+                        segment.size,
+                        batch_time=batch_time,
+                        acc=acc,
+                        m_acc=m_acc,
+                        iou=iou,
+                        m_iou=m_iou,
                     )
                 )
-                os.makedirs(
-                    os.path.join(
-                        save_path, "submit", "sequences", sequence_name, "probability"
-                    ),
-                    exist_ok=True,
-                )
-                # save the probability of the inference class
-                prob_save_path = os.path.join(save_path, "submit", "sequences", sequence_name, "probability", "{}_prob.npy".format(data_name))
-                np.save(prob_save_path, probs)
-
-            elif self.cfg.data.test.type == "NuScenesDataset":
-                np.array(pred + 1).astype(np.uint8).tofile(
-                    os.path.join(
-                        save_path,
-                        "submit",
-                        "lidarseg",
-                        "test",
-                        "{}_lidarseg.bin".format(data_name),
+                if (
+                    self.cfg.data.test.type == "ScanNetDataset"
+                    or self.cfg.data.test.type == "ScanNet200Dataset"
+                ):
+                    np.savetxt(
+                        os.path.join(save_path, "submit", "{}.txt".format(data_name)),
+                        self.test_loader.dataset.class2id[pred].reshape([-1, 1]),
+                        fmt="%d",
                     )
-                )
+                elif self.cfg.data.test.type == "SemanticKITTIDataset":
+                    # 00_000000 -> 00, 000000
+                    sequence_name, frame_name = data_name.split("_")
+                    os.makedirs(
+                        os.path.join(
+                            save_path, "submit", "sequences", sequence_name, "predictions"
+                        ),
+                        exist_ok=True,
+                    )
+                    pred = pred.astype(np.uint32)
+                    pred = np.vectorize(
+                        self.test_loader.dataset.learning_map_inv.__getitem__
+                    )(pred).astype(np.uint32)
+                    pred.tofile(
+                        os.path.join(
+                            save_path,
+                            "submit",
+                            "sequences",
+                            sequence_name,
+                            "predictions",
+                            f"{frame_name}.label",
+                        )
+                    )
+                    os.makedirs(
+                        os.path.join(
+                            save_path, "submit", "sequences", sequence_name, "probability"
+                        ),
+                        exist_ok=True,
+                    )
+                    # save the probability of the inference class
+                    prob_save_path = os.path.join(save_path, "submit", "sequences", sequence_name, "probability", "{}_prob.npy".format(data_name))
+                    np.save(prob_save_path, probs)
+
+                elif self.cfg.data.test.type == "NuScenesDataset":
+                    np.array(pred + 1).astype(np.uint8).tofile(
+                        os.path.join(
+                            save_path,
+                            "submit",
+                            "lidarseg",
+                            "test",
+                            "{}_lidarseg.bin".format(data_name),
+                        )
+                    )
 
         logger.info("Syncing ...")
         comm.synchronize()
