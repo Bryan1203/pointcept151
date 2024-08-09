@@ -99,7 +99,8 @@ class TesterBase:
             num_workers=self.cfg.batch_size_test_per_gpu,
             pin_memory=True,
             sampler=test_sampler,
-            collate_fn=self.__class__.collate_fn,
+            #collate_fn=self.__class__.collate_fn,
+            collate_fn=collate_fn,
         )
         return test_loader
 
