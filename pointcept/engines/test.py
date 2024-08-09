@@ -13,12 +13,10 @@ import torch
 import torch.distributed as dist
 import torch.nn.functional as F
 import torch.utils.data
-from functools import partial
-from collections.abc import Mapping, Sequence
 
 from .defaults import create_ddp_model
 import pointcept.utils.comm as comm
-from pointcept.datasets import build_dataset, collate_fn, point_collate_fn
+from pointcept.datasets import build_dataset, collate_fn
 from pointcept.models import build_model
 from pointcept.utils.logger import get_root_logger
 from pointcept.utils.registry import Registry
@@ -116,7 +114,7 @@ class TesterBase:
 @TESTERS.register_module()
 class SemSegTester(TesterBase):
     def test(self):
-        #assert self.test_loader.batch_size == 1
+        assert self.test_loader.batch_size == 1
         logger = get_root_logger()
         logger.info(">>>>>>>>>>>>>>>> Start Evaluation >>>>>>>>>>>>>>>>")
 
@@ -161,29 +159,10 @@ class SemSegTester(TesterBase):
         # fragment inference
         for idx, data_dict in enumerate(self.test_loader):
             end = time.time()
-            
-            logger.info(f"Processing batch {idx+1}/{len(self.test_loader)}")
-            
-            # Print information about the batch
-            for key, value in data_dict.items():
-                if isinstance(value, torch.Tensor):
-                    logger.info(f"  Shape of {key}: {value.shape}")
-                elif isinstance(value, list):
-                    logger.info(f"  Length of {key}: {len(value)}")
-                    if len(value) > 0 and isinstance(value[0], dict):
-                        for subkey, subvalue in value[0].items():
-                            if isinstance(subvalue, torch.Tensor):
-                                logger.info(f"    Shape of fragment {subkey}: {subvalue.shape}")
-
-            # Extract required data
+            data_dict = data_dict[0]  # current assume batch size is 1
             fragment_list = data_dict.pop("fragment_list")
             segment = data_dict.pop("segment")
-            data_name = data_dict.pop("name")[0]  # Assuming it's a list with one item
-            
-            logger.info(f"  Data name: {data_name}")
-            logger.info(f"  Segment shape: {segment.shape}")
-            logger.info(f"  Number of fragments: {len(fragment_list)}")
-
+            data_name = data_dict.pop("name")
             pred_save_path = os.path.join(save_path, "{}_pred.npy".format(data_name))
             if os.path.isfile(pred_save_path):
                 logger.info(
@@ -192,31 +171,37 @@ class SemSegTester(TesterBase):
                     )
                 )
                 continue
+                #pred = np.load(pred_save_path)
             else:
-                pred = torch.zeros((segment.shape[1], self.cfg.data.num_classes)).cuda()
-                for i, fragment in enumerate(fragment_list):
-                    # Move fragment to GPU
-                    for key, value in fragment.items():
-                        if isinstance(value, torch.Tensor):
-                            fragment[key] = value.cuda(non_blocking=True)
-
+                pred = torch.zeros((segment.size, self.cfg.data.num_classes)).cuda()
+                for i in range(len(fragment_list)):
+                    fragment_batch_size = 1
+                    s_i, e_i = i * fragment_batch_size, min(
+                        (i + 1) * fragment_batch_size, len(fragment_list)
+                    )
+                    input_dict = collate_fn(fragment_list[s_i:e_i])
+                    for key in input_dict.keys():
+                        if isinstance(input_dict[key], torch.Tensor):
+                            input_dict[key] = input_dict[key].cuda(non_blocking=True)
+                    idx_part = input_dict["index"]
                     with torch.no_grad():
-                        pred_part = self.model(fragment)["seg_logits"]  # (n, k)
+                        pred_part = self.model(input_dict)["seg_logits"]  # (n, k)
                         pred_part = F.softmax(pred_part, -1)
-                    
-                    if self.cfg.empty_cache:
-                        torch.cuda.empty_cache()
-                    
-                    idx_part = fragment["index"].squeeze(0)  # Remove batch dimension
-                    pred[idx_part, :] += pred_part.squeeze(0)  # Remove batch dimension
+                        #pred[idx_part[bs:be], :] += pred_part[bs:be]
+                        if self.cfg.empty_cache:
+                            torch.cuda.empty_cache()
+                        bs = 0
+                        for be in input_dict["offset"]:
+                            pred[idx_part[bs:be], :] += pred_part[bs:be]
+                            bs = be
 
                     logger.info(
-                        "Test: {}/{}-{data_name}, Fragment: {frag_idx}/{frag_num}".format(
+                        "Test: {}/{}-{data_name}, Batch: {batch_idx}/{batch_num}".format(
                             idx + 1,
                             len(self.test_loader),
                             data_name=data_name,
-                            frag_idx=i+1,
-                            frag_num=len(fragment_list),
+                            batch_idx=i,
+                            batch_num=len(fragment_list),
                         )
                     )
 
@@ -367,51 +352,8 @@ class SemSegTester(TesterBase):
 
     @staticmethod
     def collate_fn(batch):
-        #print("batch: ", batch)
-        return point_collate_fn(batch)
-    
-from torch.utils.data.dataloader import default_collate
+        return batch
 
-def point_collate_fn(batch):
-    """
-    Custom collate function for point cloud data in the tester.
-    
-    Args:
-        batch: A list of dictionaries, each representing a single sample.
-    
-    Returns:
-        A dictionary with batched data.
-    """
-    # Separate 'fragment_list' and other data
-    fragment_lists = [item.pop('fragment_list') for item in batch]
-    
-    # Collate other items
-    batched = default_collate(batch)
-    
-    # Handle 'fragment_list' separately
-    max_fragments = max(len(frags) for frags in fragment_lists)
-    batched_fragments = []
-    
-    for i in range(max_fragments):
-        fragment_batch = [frags[i] if i < len(frags) else {} for frags in fragment_lists]
-        # Collate this batch of fragments
-        batched_fragments.append(default_collate(fragment_batch))
-    
-    batched['fragment_list'] = batched_fragments
-    
-    # Print batch information for debugging
-    print(f"Collated batch size: {len(batch)}")
-    for key, value in batched.items():
-        if isinstance(value, torch.Tensor):
-            print(f"  Shape of {key}: {value.shape}")
-        elif isinstance(value, list):
-            print(f"  Length of {key}: {len(value)}")
-            if len(value) > 0 and isinstance(value[0], dict):
-                for subkey, subvalue in value[0].items():
-                    if isinstance(subvalue, torch.Tensor):
-                        print(f"    Shape of fragment {subkey}: {subvalue.shape}")
-    
-    return batched
 
 @TESTERS.register_module()
 class ClsTester(TesterBase):
