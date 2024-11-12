@@ -38,12 +38,12 @@ class SemanticKITTIDataset(DefaultDataset):
 
     def get_data_list(self):
         split2seq = dict(
-            train=[6,10,12,20,21,30],
-            val=[0,2,5,7,8,9,11,13,22,31],
-            test=[0,2,5,7,8,9,11,13,22,31],
-            # train=[0],
-            # val=[0],
-            # test=[0],
+            # train=[6,10,12,20,21,30],
+            # val=[0,2,5,7,8,9,11,13,22,31],
+            # test=[0,2,5,7,8,9,11,13,22,31],
+            train=[0],
+            val=[0],
+            test=[0],
         )
         if isinstance(self.split, str):
             seq_list = split2seq[self.split]
@@ -136,34 +136,34 @@ class SemanticKITTIDataset(DefaultDataset):
             0: 0,  # "unlabeled"
             # used the labeling from the shp file 
             # map the specific road lines to dahed, solid, and double
-            1: 2,  
-            2: 1,
-            3: 3,
-            4: 1,
-            5: 1,
-            6: 1,
+            1: 1,  
+            # 2: 1,
+            # 3: 3,
+            # 4: 1,
+            # 5: 1,
+            # 6: 1,
 
-            11: 2,
-            12: 1,
-            13: 3,
-            14: 1,
-            15: 1,
-            16: 1,
+            # 11: 2,
+            # 12: 1,
+            # 13: 3,
+            # 14: 1,
+            # 15: 1,
+            # 16: 1,
 
-            21: 2,
-            22: 1,
-            23: 3,
-            24: 1,
-            25: 1,
-            26: 1,
-            #labeling used in ITRI semantic maps
-            41: 1,
-            42: 2,
-            43: 3,
-            44: 1,
-            45: 2,
-            46: 3,
-            47: 2,
+            # 21: 2,
+            # 22: 1,
+            # 23: 3,
+            # 24: 1,
+            # 25: 1,
+            # 26: 1,
+            # #labeling used in ITRI semantic maps
+            # 41: 1,
+            # 42: 2,
+            # 43: 3,
+            # 44: 1,
+            # 45: 2,
+            # 46: 3,
+            # 47: 2,
         }
         return learning_map
 
@@ -195,7 +195,7 @@ class SemanticKITTIDataset(DefaultDataset):
             ignore_index: ignore_index,
             0: 0,  # "unlabeled"
             1: 1,  
-            2: 2,
-            3: 3,
+            # 2: 2,
+            # 3: 3,
         }
         return learning_map_inv

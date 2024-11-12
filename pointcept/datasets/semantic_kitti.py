@@ -37,24 +37,24 @@ class SemanticKITTIDataset(DefaultDataset):
         )
 
     def get_data_list(self):
-        # Generate sequence numbers 0-406
-        all_sequences = list(range(407))
+        # # Generate sequence numbers 0-406
+        # all_sequences = list(range(407))
         
-        # Randomly shuffle the sequences
-        np.random.seed(42)  # For reproducibility
-        np.random.shuffle(all_sequences)
+        # # Randomly shuffle the sequences
+        # np.random.seed(42)  # For reproducibility
+        # np.random.shuffle(all_sequences)
         
-        # Split into train (60%), val (20%), test (20%)
-        train_size = int(0.7 * len(all_sequences))
-        val_size = int(0.15 * len(all_sequences))
+        # # Split into train (60%), val (20%), test (20%)
+        # train_size = int(0.7 * len(all_sequences))
+        # val_size = int(0.15 * len(all_sequences))
         
         split2seq = dict(
-            train=all_sequences[:train_size],
-            val=all_sequences[train_size:train_size + val_size],
-            test=all_sequences[train_size + val_size:],
-            # train=[0],  # Commented out debug values
-            # val=[0],
-            # test=[0],
+        #     train=all_sequences[:train_size],
+        #     val=all_sequences[train_size:train_size + val_size],
+        #     test=all_sequences[train_size + val_size:],
+            train=[00],  # Commented out debug values
+            val=[00],
+            test=[00],
         )
         
         if isinstance(self.split, str):
@@ -79,12 +79,14 @@ class SemanticKITTIDataset(DefaultDataset):
             num_test = num_files - num_train - num_val  # Remaining frames for test
 
             # Split frames within each sequence
-            frame_sequences = list(range(num_files))
+            frame_sequences = np.array(range(num_files))
             np.random.seed(42)  # For reproducibility
             np.random.shuffle(frame_sequences)
-            train_files = seq_files[frame_sequences[:num_train]]
-            val_files = seq_files[frame_sequences[num_train:num_train + num_val]]
-            test_files = seq_files[frame_sequences[num_train + num_val:]]
+            train_files = np.take(seq_files, frame_sequences[:num_train])
+            val_files = np.take(seq_files, frame_sequences[num_train:num_train + num_val])
+            test_files = np.take(seq_files, frame_sequences[num_train + num_val:])
+
+            np.save('frameSequence.npy', frame_sequences)
 
             # Add files to data_list based on the specified split
             if self.split == "train":
@@ -168,34 +170,34 @@ class SemanticKITTIDataset(DefaultDataset):
             0: 0,  # "unlabeled"
             # used the labeling from the shp file 
             # map the specific road lines to dahed, solid, and double
-            1: 2,  
-            2: 1,
-            3: 3,
-            4: 1,
-            5: 1,
-            6: 1,
+            1: 1,  
+            # 2: 1,
+            # 3: 3,
+            # 4: 1,
+            # 5: 1,
+            # 6: 1,
 
-            11: 2,
-            12: 1,
-            13: 3,
-            14: 1,
-            15: 1,
-            16: 1,
+            # 11: 2,
+            # 12: 1,
+            # 13: 3,
+            # 14: 1,
+            # 15: 1,
+            # 16: 1,
 
-            21: 2,
-            22: 1,
-            23: 3,
-            24: 1,
-            25: 1,
-            26: 1,
-            #labeling used in ITRI semantic maps
-            41: 1,
-            42: 2,
-            43: 3,
-            44: 1,
-            45: 2,
-            46: 3,
-            47: 2,
+            # 21: 2,
+            # 22: 1,
+            # 23: 3,
+            # 24: 1,
+            # 25: 1,
+            # 26: 1,
+            # #labeling used in ITRI semantic maps
+            # 41: 1,
+            # 42: 2,
+            # 43: 3,
+            # 44: 1,
+            # 45: 2,
+            # 46: 3,
+            # 47: 2,
         }
         return learning_map
 
@@ -227,7 +229,7 @@ class SemanticKITTIDataset(DefaultDataset):
             ignore_index: ignore_index,
             0: 0,  # "unlabeled"
             1: 1,  
-            2: 2,
-            3: 3,
+            # 2: 2,
+            # 3: 3,
         }
         return learning_map_inv
