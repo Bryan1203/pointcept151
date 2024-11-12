@@ -37,26 +37,14 @@ class SemanticKITTIDataset(DefaultDataset):
         )
 
     def get_data_list(self):
-        # Generate sequence numbers 0-406
-        all_sequences = list(range(407))
-        
-        # Randomly shuffle the sequences
-        np.random.seed(42)  # For reproducibility
-        np.random.shuffle(all_sequences)
-        
-        # Split into train (60%), val (20%), test (20%)
-        train_size = int(0.7 * len(all_sequences))
-        val_size = int(0.15 * len(all_sequences))
-        
         split2seq = dict(
-            train=all_sequences[:train_size],
-            val=all_sequences[train_size:train_size + val_size],
-            test=all_sequences[train_size + val_size:],
-            # train=[0],  # Commented out debug values
+            train=[6,10,12,20,21,30],
+            val=[0,2,5,7,8,9,11,13,22,31],
+            test=[0,2,5,7,8,9,11,13,22,31],
+            # train=[0],
             # val=[0],
             # test=[0],
         )
-        
         if isinstance(self.split, str):
             seq_list = split2seq[self.split]
         elif isinstance(self.split, list):
@@ -71,29 +59,9 @@ class SemanticKITTIDataset(DefaultDataset):
             seq = str(seq).zfill(2)
             seq_folder = os.path.join(self.data_root, "dataset", "sequences", seq)
             seq_files = sorted(os.listdir(os.path.join(seq_folder, "velodyne")))
-            
-            # Determine the number of frames for each split
-            num_files = len(seq_files)
-            num_train = int(num_files * 0.7)
-            num_val = int(num_files * 0.15)
-            num_test = num_files - num_train - num_val  # Remaining frames for test
-
-            # Split frames within each sequence
-            frame_sequences = list(range(num_files))
-            np.random.seed(42)  # For reproducibility
-            np.random.shuffle(frame_sequences)
-            train_files = seq_files[frame_sequences[:num_train]]
-            val_files = seq_files[frame_sequences[num_train:num_train + num_val]]
-            test_files = seq_files[frame_sequences[num_train + num_val:]]
-
-            # Add files to data_list based on the specified split
-            if self.split == "train":
-                data_list += [os.path.join(seq_folder, "velodyne", file) for file in train_files]
-            elif self.split == "val":
-                data_list += [os.path.join(seq_folder, "velodyne", file) for file in val_files]
-            elif self.split == "test":
-                data_list += [os.path.join(seq_folder, "velodyne", file) for file in test_files]
-
+            data_list += [
+                os.path.join(seq_folder, "velodyne", file) for file in seq_files
+            ]
         return data_list
 
     def get_data(self, idx):
