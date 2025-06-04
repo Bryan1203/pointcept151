@@ -130,6 +130,11 @@ sudo sh cuda_11.8.0_520.61.05_linux.run
 or 
 sudo sh cuda_11.8.0_520.61.05_linux.run --override
 
+sudo gedit ~/.bashrc
+export CUDA_HOME=/usr/local/cuda-11.8
+export PATH=$PATH:$CUDA_HOME/bin
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/cuda-11.8/lib64
+
 conda create -n pointcept python=3.8 -y
 conda activate pointcept
 conda install ninja -y
