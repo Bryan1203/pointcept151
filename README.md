@@ -127,7 +127,13 @@ If you find _Pointcept_ useful to your research, please cite our work as encoura
 # cuda 11.8 and install nvidia driver 535.183.01
 wget https://developer.download.nvidia.com/compute/cuda/11.8.0/local_installers/cuda_11.8.0_520.61.05_linux.run
 sudo sh cuda_11.8.0_520.61.05_linux.run
+or 
+sudo sh cuda_11.8.0_520.61.05_linux.run --override
 
+sudo gedit ~/.bashrc
+export CUDA_HOME=/usr/local/cuda-11.8
+export PATH=$PATH:$CUDA_HOME/bin
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/cuda-11.8/lib64
 
 conda create -n pointcept python=3.8 -y
 conda activate pointcept
@@ -168,6 +174,15 @@ cd ../..
 pip install open3d
 ```
 
+Debug:
+subprocess.CalledProcessError: Command '['which', 'g++']' returned non-zero exit status 1.
+This error occurs because the g++ compiler is not found on your system, which is required for building PyTorch C++ extensions. The error happens when PyTorch tries to compile CUDA extensions and can't locate the C++ compiler.
+Here are the solutions based on your operating system:
+For Ubuntu/Debian:
+```bash
+sudo apt update
+sudo apt install build-essential
+```
 ## Data Preparation
 
 ### ScanNet v2
@@ -181,7 +196,7 @@ The preprocessing supports semantic and instance segmentation for both `ScanNet2
 # RAW_SCANNET_DIR: the directory of downloaded ScanNet v2 raw dataset.
 # PROCESSED_SCANNET_DIR: the directory of the processed ScanNet dataset (output dir).
 python pointcept/datasets/preprocessing/scannet/preprocess_scannet.py --dataset_root ${RAW_SCANNET_DIR} --output_root ${PROCESSED_SCANNET_DIR}
-```
+
 
 - (Alternative) Our preprocess data can also be downloaded [[here](https://connecthkuhk-my.sharepoint.com/:u:/g/personal/wuxy_connect_hku_hk/EREuB1If2DNEjz43-rdaVf4B5toMaIViXv8gEbxr9ydeYA?e=ffXeG4)], please agree the official license before download it.
 
