@@ -1,0 +1,4 @@
+Bug 01: untimeError: output with shape [] doesn't match the broadcast shape [0, 12
+
+Reason: this could be that most of the label point is ignore causing it to input empty tensor
+Fix: map the unlabeled points as background instead of ignoring them

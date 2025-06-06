@@ -171,65 +171,65 @@ class SemanticKITTIDataset(DefaultDataset):
             # used the labeling from the shp file 
             # map the specific road lines to dahed, solid, and double
             1: 1,  
-            # 2: 1,
-            # 3: 3,
-            # 4: 1,
-            # 5: 1,
-            # 6: 1,
+            2: 1,
+            3: 3,
+            4: 1,
+            5: 1,
+            6: 1,
 
-            # 11: 2,
-            # 12: 1,
-            # 13: 3,
-            # 14: 1,
-            # 15: 1,
-            # 16: 1,
+            11: 2,
+            12: 1,
+            13: 3,
+            14: 1,
+            15: 1,
+            16: 1,
 
-            # 21: 2,
-            # 22: 1,
-            # 23: 3,
-            # 24: 1,
-            # 25: 1,
-            # 26: 1,
-            # #labeling used in ITRI semantic maps
-            # 41: 1,
-            # 42: 2,
-            # 43: 3,
-            # 44: 1,
-            # 45: 2,
-            # 46: 3,
-            # 47: 2,
+            21: 2,
+            22: 1,
+            23: 3,
+            24: 1,
+            25: 1,
+            26: 1,
+            #labeling used in ITRI semantic maps
+            41: 1,
+            42: 2,
+            43: 3,
+            44: 1,
+            45: 2,
+            46: 3,
+            47: 2,
         }
         return learning_map
 
     @staticmethod
     def get_learning_map_inv(ignore_index):
         learning_map_inv = {
-            # ignore_index: ignore_index,  # "unlabeled"
-            # 0: 10,  # "car"
-            # 1: 11,  # "bicycle"
-            # 2: 15,  # "motorcycle"
-            # 3: 18,  # "truck"
-            # 4: 20,  # "other-vehicle"
-            # 5: 30,  # "person"
-            # 6: 31,  # "bicyclist"
-            # 7: 32,  # "motorcyclist"
-            # 8: 40,  # "road"
-            # 9: 44,  # "parking"
-            # 10: 48,  # "sidewalk"
-            # 11: 49,  # "other-ground"
-            # 12: 50,  # "building"
-            # 13: 51,  # "fence"
-            # 14: 70,  # "vegetation"
-            # 15: 71,  # "trunk"
-            # 16: 72,  # "terrain"
-            # 17: 80,  # "pole"
-            # 18: 81,  # "traffic-sign"
+            ignore_index: ignore_index,  # "unlabeled"
+            0: 10,  # "car"
+            1: 11,  # "bicycle"
+            2: 15,  # "motorcycle"
+            3: 18,  # "truck"
+            4: 20,  # "other-vehicle"
+            5: 30,  # "person"
+            6: 31,  # "bicyclist"
+            7: 32,  # "motorcyclist"
+            8: 40,  # "road"
+            9: 44,  # "parking"
+            10: 48,  # "sidewalk"
+            11: 49,  # "other-ground"
+            12: 50,  # "building"
+            13: 51,  # "fence"
+            14: 70,  # "vegetation"
+            15: 71,  # "trunk"
+            16: 72,  # "terrain"
+            17: 80,  # "pole"
+            18: 81,  # "traffic-sign"
 
 
-            ignore_index: ignore_index,
-            0: 0,  # "unlabeled"
-            1: 1,  
-            # 2: 2,
-            # 3: 3,
+            # ignore_index: ignore_index,
+            # 0: 0,  # "unlabeled"
+            # 1: 1,  
+            # # 2: 2,
+            # # 3: 3,
         }
         return learning_map_inv
